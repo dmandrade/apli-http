@@ -1,0 +1,27 @@
+{
+    "name": "apli/http",
+    "type": "apli-package",
+    "description": "Aplí Http package",
+    "keywords": [
+        "apli",
+        "framework",
+        "http"
+    ],
+    "homepage": "https://github.com/dmandrade/apli-http",
+    "require": {
+        "php": ">=5.6"
+    },
+    "require-dev": {
+        "codeception/codeception": "^2.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Apli\\Http\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    }
+}

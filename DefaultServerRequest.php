@@ -39,32 +39,32 @@ class DefaultServerRequest implements ServerRequest
     /**
      * @var array
      */
-    private $attributes = [];
+    protected $attributes = [];
 
     /**
      * @var array
      */
-    private $cookieParams = [];
+    protected $cookieParams = [];
 
     /**
      * @var null|array|object
      */
-    private $parsedBody;
+    protected $parsedBody;
 
     /**
      * @var array
      */
-    private $queryParams = [];
+    protected $queryParams = [];
 
     /**
      * @var array
      */
-    private $serverParams;
+    protected $serverParams;
 
     /**
      * @var array
      */
-    private $uploadedFiles;
+    protected $uploadedFiles;
 
     /**
      * @param array $serverParams Server parameters, typically from $_SERVER

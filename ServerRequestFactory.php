@@ -29,6 +29,16 @@ abstract class ServerRequestFactory
     private static $apacheRequestHeaders = 'apache_request_headers';
 
     /**
+     * Creates a new request with values from PHP's super globals.
+     *
+     * @return ServerRequest
+     */
+    public static function createFromGlobals()
+    {
+        return self::fromGlobals($_SERVER, $_GET, $_POST, $_COOKIE, $_FILES);
+    }
+
+    /**
      * Create a request from the supplied superglobal values.
      *
      * If any argument is not supplied, the corresponding superglobal value will

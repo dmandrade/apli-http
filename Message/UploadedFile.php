@@ -137,4 +137,6 @@ interface UploadedFile
      *     was provided.
      */
     public function getClientMediaType();
+
+    public function getPath();
 }

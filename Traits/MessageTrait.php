@@ -39,12 +39,12 @@ trait MessageTrait
     /**
      * @var string
      */
-    private $protocol = '1.1';
+    protected $protocol = '1.1';
 
     /**
      * @var Stream
      */
-    private $stream;
+    protected $stream;
 
     /**
      * Retrieves the HTTP protocol version as a string.
@@ -320,7 +320,7 @@ trait MessageTrait
      *
      * @param array $originalHeaders Headers to filter.
      */
-    private function setHeaders(array $originalHeaders)
+    protected function setHeaders(array $originalHeaders)
     {
         $headerNames = $headers = [];
 

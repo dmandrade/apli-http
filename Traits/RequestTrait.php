@@ -32,19 +32,19 @@ trait RequestTrait
     /**
      * @var string
      */
-    private $method = '';
+    protected $method = '';
 
     /**
      * The request-target, if it has been provided or calculated.
      *
      * @var null|string
      */
-    private $requestTarget;
+    protected $requestTarget;
 
     /**
      * @var Uri
      */
-    private $uri;
+    protected $uri;
 
     /**
      * Initialize request state.

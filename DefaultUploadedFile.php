@@ -251,6 +251,10 @@ class DefaultUploadedFile implements UploadedFile
         return $this->clientMediaType;
     }
 
+    public function getPath() {
+        return $this->file;
+    }
+
     /**
      * Write internal stream to given path
      *

@@ -11,8 +11,8 @@
  */
 namespace Apli\Http;
 
-use Apli\Http\Message\ServerRequest;
-use Apli\Http\Message\UploadedFile;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UploadedFileInterface;
 use Apli\Uri\Url;
 
 /**
@@ -31,7 +31,8 @@ abstract class ServerRequestFactory
     /**
      * Creates a new request with values from PHP's super globals.
      *
-     * @return ServerRequest
+     * @return ServerRequestInterface
+     * @throws \Apli\Uri\UriException
      */
     public static function createFromGlobals()
     {
@@ -47,14 +48,13 @@ abstract class ServerRequestFactory
      * The ServerRequest created is then passed to the fromServer() method in
      * order to marshal the request URI and headers.
      *
-     * @see fromServer()
-     * @param array $server $_SERVER superglobal
-     * @param array $query $_GET superglobal
-     * @param array $body $_POST superglobal
-     * @param array $cookies $_COOKIE superglobal
-     * @param array $files $_FILES superglobal
-     * @return ServerRequest
-     * @throws InvalidArgumentException for invalid file values
+     * @param array|null $server
+     * @param array|null $query
+     * @param array|null $body
+     * @param array|null $cookies
+     * @param array|null $files
+     * @return ServerRequestInterface
+     * @throws \Apli\Uri\UriException
      */
     public static function fromGlobals(
         array $server = null,
@@ -126,9 +126,10 @@ abstract class ServerRequestFactory
     /**
      * Marshal a Uri instance based on the values presnt in the $_SERVER array and headers.
      *
-     * @param array $server SAPI parameters
-     * @param array $headers HTTP request headers
-     * @return Uri
+     * @param array $server
+     * @param array $headers
+     * @return Url
+     * @throws \Apli\Uri\UriException
      */
     public static function marshalUriFromSapi(array $server, array $headers)
     {
@@ -400,7 +401,7 @@ abstract class ServerRequestFactory
          * @param int[]|array[] $errorTree
          * @param string[]|array[]|null $nameTree
          * @param string[]|array[]|null $typeTree
-         * @return UploadedFile[]|array[]
+         * @return UploadedFileInterface[]|array[]
          */
         $recursiveNormalize = function (
             array $tmpNameTree,
@@ -445,7 +446,7 @@ abstract class ServerRequestFactory
          * SAPI.
          *
          * @param array $files
-         * @return UploadedFile[]
+         * @return UploadedFileInterface[]
          */
         $normalizeUploadedFileSpecification = function (array $files = []) use (&$recursiveNormalize) {
             if (! isset($files['tmp_name']) || ! is_array($files['tmp_name'])
@@ -471,7 +472,7 @@ abstract class ServerRequestFactory
 
         $normalized = [];
         foreach ($files as $key => $value) {
-            if ($value instanceof UploadedFile) {
+            if ($value instanceof UploadedFileInterface) {
                 $normalized[$key] = $value;
                 continue;
             }
@@ -499,7 +500,7 @@ abstract class ServerRequestFactory
      * Create an uploaded file instance from an array of values.
      *
      * @param array $spec A single $_FILES entry.
-     * @return UploadedFile
+     * @return UploadedFileInterface
      * @throws InvalidArgumentException if one or more of the tmp_name, size,
      *     or error keys are missing from $spec.
      */

@@ -21,10 +21,10 @@ namespace Apli\Http\Response;
 
 use Apli\Http\Stream\FileAccess;
 use InvalidArgumentException;
-use Apli\Http\Message\Response;
+use Psr\Http\Message\ResponseInterface;
 use Apli\Http\Traits\MessageTrait;
 
-class DefaultResponse implements Response
+class DefaultResponse implements ResponseInterface
 {
     use MessageTrait;
 

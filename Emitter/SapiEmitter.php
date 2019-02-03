@@ -19,34 +19,27 @@
 
 namespace Apli\Http\Emitter;
 
+use Psr\Http\Message\ResponseInterface;
 
-use Apli\Http\Message\Response;
-use Apli\Http\Server\Emitter;
-
-class SapiEmitter implements Emitter
+class SapiEmitter extends AbstractSapiEmitter
 {
-    use SapiEmitterTrait;
-
     /**
-     * Emits a response for a PHP SAPI environment.
-     *
-     * Emits the status line and headers via the header() function, and the
-     * body content via the output buffer.
+     * {@inheritdoc}
      */
-    public function emit(Response $response)
+    public function emit(ResponseInterface $response)
     {
         $this->assertNoPreviousOutput();
         $this->emitHeaders($response);
         $this->emitStatusLine($response);
         $this->emitBody($response);
-        return true;
+        $this->closeConnection();
     }
 
     /**
      * Emit the message body.
-     * @param Response $response
+     * @param ResponseInterface $response
      */
-    private function emitBody(Response $response)
+    private function emitBody(ResponseInterface $response)
     {
         echo $response->getBody();
     }

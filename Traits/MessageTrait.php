@@ -12,7 +12,7 @@
 namespace Apli\Http\Traits;
 
 use Apli\Http\HeaderSecurity;
-use Apli\Http\Message\Stream;
+use Psr\Http\Message\StreamInterface;
 use Apli\Http\Stream\DefaultStream;
 
 /**
@@ -42,7 +42,7 @@ trait MessageTrait
     protected $protocol = '1.1';
 
     /**
-     * @var Stream
+     * @var StreamInterface
      */
     protected $stream;
 
@@ -269,7 +269,7 @@ trait MessageTrait
     /**
      * Gets the body of the message.
      *
-     * @return Stream Returns the body as a stream.
+     * @return StreamInterface Returns the body as a stream.
      */
     public function getBody()
     {
@@ -285,20 +285,25 @@ trait MessageTrait
      * immutability of the message, and MUST return a new instance that has the
      * new body stream.
      *
-     * @param Stream $body Body.
+     * @param StreamInterface $body Body.
      * @return static
      * @throws \InvalidArgumentException When the body is not valid.
      */
-    public function withBody(Stream $body)
+    public function withBody(StreamInterface $body)
     {
         $new = clone $this;
         $new->stream = $body;
         return $new;
     }
 
+    /**
+     * @param $stream
+     * @param $modeIfNotInstance
+     * @return StreamInterface
+     */
     private function getStream($stream, $modeIfNotInstance)
     {
-        if ($stream instanceof Stream) {
+        if ($stream instanceof StreamInterface) {
             return $stream;
         }
 

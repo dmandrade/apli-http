@@ -20,7 +20,7 @@
 namespace Apli\Http\Exception;
 
 use Apli\Http\Emitter\EmitterStack;
-use Apli\Http\Server\Emitter;
+use Apli\Http\Emitter\EmitterInterface;
 use InvalidArgumentException;
 
 class InvalidEmitterException extends InvalidArgumentException
@@ -33,7 +33,7 @@ class InvalidEmitterException extends InvalidArgumentException
         return new self(sprintf(
             '%s can only compose %s implementations; received %s',
             EmitterStack::class,
-            Emitter::class,
+            EmitterInterface::class,
             is_object($emitter) ? get_class($emitter) : gettype($emitter)
         ));
     }

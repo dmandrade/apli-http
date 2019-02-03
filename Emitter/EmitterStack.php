@@ -22,19 +22,18 @@ namespace Apli\Http\Emitter;
 
 use Apli\Data\Stack;
 use Apli\Http\Exception\InvalidEmitterException;
-use Apli\Http\Message\Response;
-use Apli\Http\Server\Emitter;
+use Psr\Http\Message\ResponseInterface;
 
-class EmitterStack extends Stack implements Emitter
+class EmitterStack extends Stack implements EmitterInterface
 {
     /**
      * Emits a response, including status line, headers, and the message body,
      * according to the environment.
      *
-     * @param Response $response
+     * @param ResponseInterface $response
      * @return bool
      */
-    public function emit(Response $response)
+    public function emit(ResponseInterface $response)
     {
         foreach ($this as $emitter) {
             if (false !== $emitter->emit($response)) {
@@ -54,14 +53,14 @@ class EmitterStack extends Stack implements Emitter
      */
     public function offsetSet($index, $emitter)
     {
-        $this->validateEmitter($emitter);
+        $this->validateEmitter((array) $emitter);
         parent::offsetSet($index, $emitter);
     }
 
     /**
      * Push an emitter to the stack.
      *
-     * @param ...Emitter $emitters
+     * @param ...EmitterInterface $emitters
      * @return void
      * @throws InvalidArgumentException if not an EmitterInterface instance
      */
@@ -74,13 +73,13 @@ class EmitterStack extends Stack implements Emitter
     /**
      * Validate that an emitter implements EmitterInterface.
      *
-     * @param Emmiter[] $emitters
+     * @param EmitterInterface[] $emitters
      * @throws InvalidEmitterException for non-emitter instances
      */
     private function validateEmitter($emitters)
     {
         foreach ($emitters as $emitter) {
-            if (!$emitter instanceof Emitter) {
+            if (!$emitter instanceof EmitterInterface) {
                 throw InvalidEmitterException::forEmitter($emitter);
             }
         }

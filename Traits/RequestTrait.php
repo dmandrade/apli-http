@@ -11,9 +11,9 @@
  */
 namespace Apli\Http\Traits;
 
-use Apli\Http\Message\Stream;
-use Apli\Uri\Uri;
 use Apli\Uri\Url;
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UriInterface;
 
 /**
  * Trait with common request behaviors.
@@ -53,7 +53,7 @@ trait RequestTrait
      *
      * @param null|string|Uri $uri URI for the request, if any.
      * @param null|string $method HTTP method for the request, if any.
-     * @param string|resource|Stream $body Message body, if any.
+     * @param string|resource|StreamInterface $body Message body, if any.
      * @param array $headers Headers for the message, if any.
      * @throws InvalidArgumentException for any invalid value.
      */
@@ -88,11 +88,11 @@ trait RequestTrait
      * Otherwise, it raises an exception.
      *
      * @param null|string|Uri $uri
-     * @return Uri
+     * @return UriInterface
      */
     private function createUri($uri)
     {
-        if ($uri instanceof Uri) {
+        if ($uri instanceof UriInterface) {
             return $uri;
         }
 
@@ -232,11 +232,11 @@ trait RequestTrait
      * new Uri instance.
      *
      * @link http://tools.ietf.org/html/rfc3986#section-4.3
-     * @param Uri $uri New request URI to use.
+     * @param UriInterface $uri New request URI to use.
      * @param bool $preserveHost Preserve the original state of the Host header.
      * @return static
      */
-    public function withUri(Uri $uri, $preserveHost = false)
+    public function withUri(UriInterface $uri, $preserveHost = false)
     {
         $new = clone $this;
         $new->uri = $uri;

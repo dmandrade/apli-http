@@ -12,8 +12,8 @@
 
 namespace Apli\Http;
 
-use Apli\Http\Message\ServerRequest;
-use Apli\Http\Message\UploadedFile;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UploadedFileInterface;
 use Apli\Http\Stream\PhpInputStream;
 use Apli\Http\Traits\RequestTrait;
 use InvalidArgumentException;
@@ -32,7 +32,7 @@ use InvalidArgumentException;
  * implemented such that they retain the internal state of the current
  * message and return a new instance that contains the changed state.
  */
-class DefaultServerRequest implements ServerRequest
+class DefaultServerRequest implements ServerRequestInterface
 {
     use RequestTrait;
 
@@ -277,7 +277,7 @@ class DefaultServerRequest implements ServerRequest
                 continue;
             }
 
-            if (! $file instanceof UploadedFile) {
+            if (! $file instanceof UploadedFileInterface) {
                 throw new InvalidArgumentException('Invalid leaf in uploaded files structure');
             }
         }

@@ -21,13 +21,13 @@ namespace Apli\Http\Stream;
 
 
 use InvalidArgumentException;
-use Apli\Http\Message\Stream;
+use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 
 use const E_WARNING;
 use const SEEK_SET;
 
-class DefaultStream implements Stream
+class DefaultStream implements StreamInterface
 {
 
     /**

@@ -20,12 +20,12 @@
 namespace Apli\Http;
 
 
-use Apli\Http\Message\Stream;
-use Apli\Http\Message\UploadedFile;
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UploadedFileInterface;
 use Apli\Http\Stream\DefaultStream;
 use Apli\Http\Stream\FileAccess;
 
-class DefaultUploadedFile implements UploadedFile
+class DefaultUploadedFile implements UploadedFileInterface
 {
 
     const ERROR_MESSAGES = [

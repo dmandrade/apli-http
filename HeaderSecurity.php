@@ -4,10 +4,10 @@
  *
  *  This file is part of the apli project.
  *
- *  @project apli
- *  @file HeaderSecurity.php
- *  @author Danilo Andrade <danilo@webbingbrasil.com.br>
- *  @date 03/09/18 at 18:47
+ * @project apli
+ * @file HeaderSecurity.php
+ * @author Danilo Andrade <danilo@webbingbrasil.com.br>
+ * @date 03/09/18 at 18:47
  */
 
 namespace Apli\Http;
@@ -46,7 +46,7 @@ final class HeaderSecurity
      */
     public static function filter($value)
     {
-        $value  = (string) $value;
+        $value = (string)$value;
         $length = strlen($value);
         $string = '';
         for ($i = 0; $i < $length; $i += 1) {
@@ -57,7 +57,7 @@ final class HeaderSecurity
                 $lf = ord($value[$i + 1]);
                 $ws = ord($value[$i + 2]);
                 if ($lf === 10 && in_array($ws, [9, 32], true)) {
-                    $string .= $value[$i] . $value[$i + 1];
+                    $string .= $value[$i].$value[$i + 1];
                     $i += 1;
                 }
 
@@ -83,6 +83,28 @@ final class HeaderSecurity
     }
 
     /**
+     * Assert a header value is valid.
+     *
+     * @param string $value
+     * @throws InvalidArgumentException for invalid values
+     */
+    public static function assertValid($value)
+    {
+        if (!is_string($value) && !is_numeric($value)) {
+            throw new InvalidArgumentException(sprintf(
+                'Invalid header value type; must be a string or numeric; received %s',
+                (is_object($value) ? get_class($value) : gettype($value))
+            ));
+        }
+        if (!self::isValid($value)) {
+            throw new InvalidArgumentException(sprintf(
+                '"%s" is not valid header value',
+                $value
+            ));
+        }
+    }
+
+    /**
      * Validate a header value.
      *
      * Per RFC 7230, only VISIBLE ASCII characters, spaces, and horizontal
@@ -95,7 +117,7 @@ final class HeaderSecurity
      */
     public static function isValid($value)
     {
-        $value  = (string) $value;
+        $value = (string)$value;
 
         // Look for:
         // \n not preceded by \r, OR
@@ -120,28 +142,6 @@ final class HeaderSecurity
     }
 
     /**
-     * Assert a header value is valid.
-     *
-     * @param string $value
-     * @throws InvalidArgumentException for invalid values
-     */
-    public static function assertValid($value)
-    {
-        if (! is_string($value) && ! is_numeric($value)) {
-            throw new InvalidArgumentException(sprintf(
-                'Invalid header value type; must be a string or numeric; received %s',
-                (is_object($value) ? get_class($value) : gettype($value))
-            ));
-        }
-        if (! self::isValid($value)) {
-            throw new InvalidArgumentException(sprintf(
-                '"%s" is not valid header value',
-                $value
-            ));
-        }
-    }
-
-    /**
      * Assert whether or not a header name is valid.
      *
      * @see http://tools.ietf.org/html/rfc7230#section-3.2
@@ -150,13 +150,13 @@ final class HeaderSecurity
      */
     public static function assertValidName($name)
     {
-        if (! is_string($name)) {
+        if (!is_string($name)) {
             throw new InvalidArgumentException(sprintf(
                 'Invalid header name type; expected string; received %s',
                 (is_object($name) ? get_class($name) : gettype($name))
             ));
         }
-        if (! preg_match('/^[a-zA-Z0-9\'`#$%&*+.^_|~!-]+$/', $name)) {
+        if (!preg_match('/^[a-zA-Z0-9\'`#$%&*+.^_|~!-]+$/', $name)) {
             throw new InvalidArgumentException(sprintf(
                 '"%s" is not valid header name',
                 $name

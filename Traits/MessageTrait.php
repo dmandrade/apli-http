@@ -4,16 +4,17 @@
  *
  *  This file is part of the apli project.
  *
- *  @project apli
- *  @file MessageTrait.php
- *  @author Danilo Andrade <danilo@webbingbrasil.com.br>
- *  @date 03/09/18 at 18:29
+ * @project apli
+ * @file MessageTrait.php
+ * @author Danilo Andrade <danilo@webbingbrasil.com.br>
+ * @date 03/09/18 at 18:29
  */
+
 namespace Apli\Http\Traits;
 
 use Apli\Http\HeaderSecurity;
-use Psr\Http\Message\StreamInterface;
 use Apli\Http\Stream\DefaultStream;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Trait implementing the various methods defined in MessageInterface.
@@ -80,6 +81,36 @@ trait MessageTrait
     }
 
     /**
+     * Validate the HTTP protocol version
+     *
+     * @param string $version
+     * @throws InvalidArgumentException on invalid HTTP protocol version
+     */
+    private function validateProtocolVersion($version)
+    {
+        if (empty($version)) {
+            throw new InvalidArgumentException(
+                'HTTP protocol version can not be empty'
+            );
+        }
+        if (!is_string($version)) {
+            throw new InvalidArgumentException(sprintf(
+                'Unsupported HTTP protocol version; must be a string, received %s',
+                (is_object($version) ? get_class($version) : gettype($version))
+            ));
+        }
+
+        // HTTP/1 uses a "<major>.<minor>" numbering scheme to indicate
+        // versions of the protocol, while HTTP/2 does not.
+        if (!preg_match('#^(1\.[01]|2)$#', $version)) {
+            throw new InvalidArgumentException(sprintf(
+                'Unsupported HTTP protocol version "%s" provided',
+                $version
+            ));
+        }
+    }
+
+    /**
      * Retrieves all message headers.
      *
      * The keys represent the header name as it will be sent over the wire, and
@@ -106,41 +137,27 @@ trait MessageTrait
     }
 
     /**
-     * Checks if a header exists by the given case-insensitive name.
+     * Filter a set of headers to ensure they are in the correct internal format.
      *
-     * @param string $header Case-insensitive header name.
-     * @return bool Returns true if any header names match the given header
-     *     name using a case-insensitive string comparison. Returns false if
-     *     no matching header name is found in the message.
+     * Used by message constructors to allow setting all initial headers at once.
+     *
+     * @param array $originalHeaders Headers to filter.
      */
-    public function hasHeader($header)
+    protected function setHeaders(array $originalHeaders)
     {
-        return isset($this->headerNames[strtolower($header)]);
-    }
+        $headerNames = $headers = [];
 
-    /**
-     * Retrieves a message header value by the given case-insensitive name.
-     *
-     * This method returns an array of all the header values of the given
-     * case-insensitive header name.
-     *
-     * If the header does not appear in the message, this method MUST return an
-     * empty array.
-     *
-     * @param string $header Case-insensitive header field name.
-     * @return string[] An array of string values as provided for the given
-     *    header. If the header does not appear in the message, this method MUST
-     *    return an empty array.
-     */
-    public function getHeader($header)
-    {
-        if (! $this->hasHeader($header)) {
-            return [];
+        foreach ($originalHeaders as $header => $value) {
+            $value = $this->filterHeaderValue($value);
+
+            $this->assertHeader($header);
+
+            $headerNames[strtolower($header)] = $header;
+            $headers[$header] = $value;
         }
 
-        $header = $this->headerNames[strtolower($header)];
-
-        return $this->headers[$header];
+        $this->headerNames = $headerNames;
+        $this->headers = $headers;
     }
 
     /**
@@ -173,6 +190,89 @@ trait MessageTrait
     }
 
     /**
+     * Retrieves a message header value by the given case-insensitive name.
+     *
+     * This method returns an array of all the header values of the given
+     * case-insensitive header name.
+     *
+     * If the header does not appear in the message, this method MUST return an
+     * empty array.
+     *
+     * @param string $header Case-insensitive header field name.
+     * @return string[] An array of string values as provided for the given
+     *    header. If the header does not appear in the message, this method MUST
+     *    return an empty array.
+     */
+    public function getHeader($header)
+    {
+        if (!$this->hasHeader($header)) {
+            return [];
+        }
+
+        $header = $this->headerNames[strtolower($header)];
+
+        return $this->headers[$header];
+    }
+
+    /**
+     * Checks if a header exists by the given case-insensitive name.
+     *
+     * @param string $header Case-insensitive header name.
+     * @return bool Returns true if any header names match the given header
+     *     name using a case-insensitive string comparison. Returns false if
+     *     no matching header name is found in the message.
+     */
+    public function hasHeader($header)
+    {
+        return isset($this->headerNames[strtolower($header)]);
+    }
+
+    /**
+     * Return an instance with the specified header appended with the
+     * given value.
+     *
+     * Existing values for the specified header will be maintained. The new
+     * value(s) will be appended to the existing list. If the header did not
+     * exist previously, it will be added.
+     *
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * new header and/or value.
+     *
+     * @param string          $header Case-insensitive header field name to add.
+     * @param string|string[] $value Header value(s).
+     * @return static
+     * @throws \InvalidArgumentException for invalid header names or values.
+     */
+    public function withAddedHeader($header, $value)
+    {
+        $this->assertHeader($header);
+
+        if (!$this->hasHeader($header)) {
+            return $this->withHeader($header, $value);
+        }
+
+        $header = $this->headerNames[strtolower($header)];
+
+        $new = clone $this;
+        $value = $this->filterHeaderValue($value);
+        $new->headers[$header] = array_merge($this->headers[$header], $value);
+        return $new;
+    }
+
+    /**
+     * Ensure header name and values are valid.
+     *
+     * @param string $name
+     *
+     * @throws InvalidArgumentException
+     */
+    private function assertHeader($name)
+    {
+        HeaderSecurity::assertValidName($name);
+    }
+
+    /**
      * Return an instance with the provided header, replacing any existing
      * values of any headers with the same case-insensitive name.
      *
@@ -183,7 +283,7 @@ trait MessageTrait
      * immutability of the message, and MUST return an instance that has the
      * new and/or updated header and value.
      *
-     * @param string $header Case-insensitive header field name.
+     * @param string          $header Case-insensitive header field name.
      * @param string|string[] $value Header value(s).
      * @return static
      * @throws \InvalidArgumentException for invalid header names or values.
@@ -202,42 +302,26 @@ trait MessageTrait
         $value = $this->filterHeaderValue($value);
 
         $new->headerNames[$normalized] = $header;
-        $new->headers[$header]         = $value;
+        $new->headers[$header] = $value;
 
         return $new;
     }
 
     /**
-     * Return an instance with the specified header appended with the
-     * given value.
-     *
-     * Existing values for the specified header will be maintained. The new
-     * value(s) will be appended to the existing list. If the header did not
-     * exist previously, it will be added.
-     *
-     * This method MUST be implemented in such a way as to retain the
-     * immutability of the message, and MUST return an instance that has the
-     * new header and/or value.
-     *
-     * @param string $header Case-insensitive header field name to add.
-     * @param string|string[] $value Header value(s).
-     * @return static
-     * @throws \InvalidArgumentException for invalid header names or values.
+     * @param mixed $values
+     * @return string[]
      */
-    public function withAddedHeader($header, $value)
+    private function filterHeaderValue($values)
     {
-        $this->assertHeader($header);
-
-        if (! $this->hasHeader($header)) {
-            return $this->withHeader($header, $value);
+        if (!is_array($values)) {
+            $values = [$values];
         }
 
-        $header = $this->headerNames[strtolower($header)];
+        return array_map(function ($value) {
+            HeaderSecurity::assertValid($value);
 
-        $new = clone $this;
-        $value = $this->filterHeaderValue($value);
-        $new->headers[$header] = array_merge($this->headers[$header], $value);
-        return $new;
+            return (string)$value;
+        }, $values);
     }
 
     /**
@@ -254,12 +338,12 @@ trait MessageTrait
      */
     public function withoutHeader($header)
     {
-        if (! $this->hasHeader($header)) {
+        if (!$this->hasHeader($header)) {
             return clone $this;
         }
 
         $normalized = strtolower($header);
-        $original   = $this->headerNames[$normalized];
+        $original = $this->headerNames[$normalized];
 
         $new = clone $this;
         unset($new->headers[$original], $new->headerNames[$normalized]);
@@ -307,97 +391,14 @@ trait MessageTrait
             return $stream;
         }
 
-        if (! is_string($stream) && ! is_resource($stream)) {
+        if (!is_string($stream) && !is_resource($stream)) {
             throw new InvalidArgumentException(
                 'Stream must be a string stream resource identifier, '
-                . 'an actual stream resource, '
-                . 'or a Stream implementation'
+                .'an actual stream resource, '
+                .'or a Stream implementation'
             );
         }
 
         return new DefaultStream($stream, $modeIfNotInstance);
-    }
-
-    /**
-     * Filter a set of headers to ensure they are in the correct internal format.
-     *
-     * Used by message constructors to allow setting all initial headers at once.
-     *
-     * @param array $originalHeaders Headers to filter.
-     */
-    protected function setHeaders(array $originalHeaders)
-    {
-        $headerNames = $headers = [];
-
-        foreach ($originalHeaders as $header => $value) {
-            $value = $this->filterHeaderValue($value);
-
-            $this->assertHeader($header);
-
-            $headerNames[strtolower($header)] = $header;
-            $headers[$header] = $value;
-        }
-
-        $this->headerNames = $headerNames;
-        $this->headers = $headers;
-    }
-
-    /**
-     * Validate the HTTP protocol version
-     *
-     * @param string $version
-     * @throws InvalidArgumentException on invalid HTTP protocol version
-     */
-    private function validateProtocolVersion($version)
-    {
-        if (empty($version)) {
-            throw new InvalidArgumentException(
-                'HTTP protocol version can not be empty'
-            );
-        }
-        if (! is_string($version)) {
-            throw new InvalidArgumentException(sprintf(
-                'Unsupported HTTP protocol version; must be a string, received %s',
-                (is_object($version) ? get_class($version) : gettype($version))
-            ));
-        }
-
-        // HTTP/1 uses a "<major>.<minor>" numbering scheme to indicate
-        // versions of the protocol, while HTTP/2 does not.
-        if (! preg_match('#^(1\.[01]|2)$#', $version)) {
-            throw new InvalidArgumentException(sprintf(
-                'Unsupported HTTP protocol version "%s" provided',
-                $version
-            ));
-        }
-    }
-
-    /**
-     * @param mixed $values
-     * @return string[]
-     */
-    private function filterHeaderValue($values)
-    {
-        if (! is_array($values)) {
-            $values = [$values];
-        }
-
-        return array_map(function ($value) {
-            HeaderSecurity::assertValid($value);
-
-            return (string) $value;
-        }, $values);
-    }
-
-    /**
-     * Ensure header name and values are valid.
-     *
-     * @param string $name
-     *
-     * @throws InvalidArgumentException
-     */
-    private function assertHeader($name)
-    {
-        HeaderSecurity::assertValidName($name);
     }
 }

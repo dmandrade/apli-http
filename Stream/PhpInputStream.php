@@ -4,10 +4,10 @@
  *
  *  This file is part of the apli project.
  *
- *  @project apli
- *  @file PhpInputStream.php
- *  @author Danilo Andrade <danilo@webbingbrasil.com.br>
- *  @date 03/09/18 at 18:33
+ * @project apli
+ * @file PhpInputStream.php
+ * @author Danilo Andrade <danilo@webbingbrasil.com.br>
+ * @date 03/09/18 at 18:33
  */
 
 /**
@@ -57,6 +57,25 @@ class PhpInputStream extends DefaultStream
     /**
      * {@inheritdoc}
      */
+    public function getContents($maxLength = -1)
+    {
+        if ($this->reachedEof) {
+            return $this->cache;
+        }
+
+        $contents = stream_get_contents($this->resource, $maxLength);
+        $this->cache .= $contents;
+
+        if ($maxLength === -1 || $this->eof()) {
+            $this->reachedEof = true;
+        }
+
+        return $contents;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isWritable()
     {
         return false;
@@ -68,7 +87,7 @@ class PhpInputStream extends DefaultStream
     public function read($length)
     {
         $content = parent::read($length);
-        if (! $this->reachedEof) {
+        if (!$this->reachedEof) {
             $this->cache .= $content;
         }
 
@@ -77,24 +96,5 @@ class PhpInputStream extends DefaultStream
         }
 
         return $content;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getContents($maxLength = -1)
-    {
-        if ($this->reachedEof) {
-            return $this->cache;
-        }
-
-        $contents     = stream_get_contents($this->resource, $maxLength);
-        $this->cache .= $contents;
-
-        if ($maxLength === -1 || $this->eof()) {
-            $this->reachedEof = true;
-        }
-
-        return $contents;
     }
 }

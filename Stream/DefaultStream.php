@@ -4,10 +4,10 @@
  *
  *  This file is part of the apli project.
  *
- *  @project apli
- *  @file AbstractStream.php
- *  @author Danilo Andrade <danilo@webbingbrasil.com.br>
- *  @date 03/09/18 at 18:33
+ * @project apli
+ * @file AbstractStream.php
+ * @author Danilo Andrade <danilo@webbingbrasil.com.br>
+ * @date 03/09/18 at 18:33
  */
 
 /**
@@ -23,7 +23,6 @@ namespace Apli\Http\Stream;
 use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
-
 use const E_WARNING;
 use const SEEK_SET;
 
@@ -42,7 +41,7 @@ class DefaultStream implements StreamInterface
 
     /**
      * @param string|resource $stream
-     * @param FileAccess $mode Mode with which to open stream
+     * @param FileAccess      $mode Mode with which to open stream
      * @throws InvalidArgumentException
      */
     public function __construct($stream, FileAccess $mode = null)
@@ -51,11 +50,56 @@ class DefaultStream implements StreamInterface
     }
 
     /**
+     * Set the internal stream resource.
+     *
+     * @param string|resource $stream String stream target or stream resource.
+     * @param FileAccess      $mode Resource mode for stream target.
+     * @throws InvalidArgumentException for invalid streams or resources.
+     */
+    private function setStream($stream, FileAccess $mode = null)
+    {
+        if ($mode == null) {
+            $mode = FileAccess::READ_FROM_BEGIN;
+        }
+
+        $error = null;
+        $resource = $stream;
+
+        if (is_string($stream)) {
+            set_error_handler(function ($e) use (&$error) {
+                if ($e !== E_WARNING) {
+                    return;
+                }
+
+                $error = $e;
+            });
+            $resource = fopen($stream, $mode);
+            restore_error_handler();
+        }
+
+        if ($error) {
+            throw new InvalidArgumentException('Invalid stream reference provided');
+        }
+
+        if (!is_resource($resource) || 'stream' !== get_resource_type($resource)) {
+            throw new InvalidArgumentException(
+                'Invalid stream provided; must be a string stream identifier or stream resource'
+            );
+        }
+
+        if ($stream !== $resource) {
+            $this->stream = $stream;
+        }
+
+        $this->resource = $resource;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function __toString()
     {
-        if (! $this->isReadable()) {
+        if (!$this->isReadable()) {
             return '';
         }
 
@@ -73,9 +117,83 @@ class DefaultStream implements StreamInterface
     /**
      * {@inheritdoc}
      */
+    public function isReadable()
+    {
+        if (!$this->resource) {
+            return false;
+        }
+
+        $meta = stream_get_meta_data($this->resource);
+        $mode = $meta['mode'];
+
+        return (strstr($mode, 'r') || strstr($mode, '+'));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isSeekable()
+    {
+        if (!$this->resource) {
+            return false;
+        }
+
+        $meta = stream_get_meta_data($this->resource);
+        return $meta['seekable'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rewind()
+    {
+        return $this->seek(0);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function seek($offset, $whence = SEEK_SET)
+    {
+        if (!$this->resource) {
+            throw new RuntimeException('No resource available; cannot seek position');
+        }
+
+        if (!$this->isSeekable()) {
+            throw new RuntimeException('Stream is not seekable');
+        }
+
+        $result = fseek($this->resource, $offset, $whence);
+
+        if (0 !== $result) {
+            throw new RuntimeException('Error seeking within stream');
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContents()
+    {
+        if (!$this->isReadable()) {
+            throw new RuntimeException('Stream is not readable');
+        }
+
+        $result = stream_get_contents($this->resource);
+        if (false === $result) {
+            throw new RuntimeException('Error reading from stream');
+        }
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function close()
     {
-        if (! $this->resource) {
+        if (!$this->resource) {
             return;
         }
 
@@ -97,7 +215,7 @@ class DefaultStream implements StreamInterface
      * Attach a new stream/resource to the instance.
      *
      * @param string|resource $resource
-     * @param FileAccess $mode
+     * @param FileAccess      $mode
      * @throws InvalidArgumentException for stream identifier that cannot be
      *     cast to a resource
      * @throws InvalidArgumentException for non-resource stream
@@ -129,12 +247,12 @@ class DefaultStream implements StreamInterface
      */
     public function tell()
     {
-        if (! $this->resource) {
+        if (!$this->resource) {
             throw new RuntimeException('No resource available; cannot tell position');
         }
 
         $result = ftell($this->resource);
-        if (! is_int($result)) {
+        if (!is_int($result)) {
             throw new RuntimeException('Error occurred during tell operation');
         }
 
@@ -146,7 +264,7 @@ class DefaultStream implements StreamInterface
      */
     public function eof()
     {
-        if (! $this->resource) {
+        if (!$this->resource) {
             return true;
         }
 
@@ -156,44 +274,22 @@ class DefaultStream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function isSeekable()
+    public function write($string)
     {
-        if (! $this->resource) {
-            return false;
+        if (!$this->resource) {
+            throw new RuntimeException('No resource available; cannot write');
         }
 
-        $meta = stream_get_meta_data($this->resource);
-        return $meta['seekable'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function seek($offset, $whence = SEEK_SET)
-    {
-        if (! $this->resource) {
-            throw new RuntimeException('No resource available; cannot seek position');
+        if (!$this->isWritable()) {
+            throw new RuntimeException('Stream is not writable');
         }
 
-        if (! $this->isSeekable()) {
-            throw new RuntimeException('Stream is not seekable');
+        $result = fwrite($this->resource, $string);
+
+        if (false === $result) {
+            throw new RuntimeException('Error writing to stream');
         }
-
-        $result = fseek($this->resource, $offset, $whence);
-
-        if (0 !== $result) {
-            throw new RuntimeException('Error seeking within stream');
-        }
-
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind()
-    {
-        return $this->seek(0);
+        return $result;
     }
 
     /**
@@ -201,7 +297,7 @@ class DefaultStream implements StreamInterface
      */
     public function isWritable()
     {
-        if (! $this->resource) {
+        if (!$this->resource) {
             return false;
         }
 
@@ -220,49 +316,13 @@ class DefaultStream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function write($string)
-    {
-        if (! $this->resource) {
-            throw new RuntimeException('No resource available; cannot write');
-        }
-
-        if (! $this->isWritable()) {
-            throw new RuntimeException('Stream is not writable');
-        }
-
-        $result = fwrite($this->resource, $string);
-
-        if (false === $result) {
-            throw new RuntimeException('Error writing to stream');
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isReadable()
-    {
-        if (! $this->resource) {
-            return false;
-        }
-
-        $meta = stream_get_meta_data($this->resource);
-        $mode = $meta['mode'];
-
-        return (strstr($mode, 'r') || strstr($mode, '+'));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function read($length)
     {
-        if (! $this->resource) {
+        if (!$this->resource) {
             throw new RuntimeException('No resource available; cannot read');
         }
 
-        if (! $this->isReadable()) {
+        if (!$this->isReadable()) {
             throw new RuntimeException('Stream is not readable');
         }
 
@@ -278,22 +338,6 @@ class DefaultStream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function getContents()
-    {
-        if (! $this->isReadable()) {
-            throw new RuntimeException('Stream is not readable');
-        }
-
-        $result = stream_get_contents($this->resource);
-        if (false === $result) {
-            throw new RuntimeException('Error reading from stream');
-        }
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getMetadata($key = null)
     {
         if (null === $key) {
@@ -301,55 +345,10 @@ class DefaultStream implements StreamInterface
         }
 
         $metadata = stream_get_meta_data($this->resource);
-        if (! array_key_exists($key, $metadata)) {
+        if (!array_key_exists($key, $metadata)) {
             return null;
         }
 
         return $metadata[$key];
-    }
-
-    /**
-     * Set the internal stream resource.
-     *
-     * @param string|resource $stream String stream target or stream resource.
-     * @param FileAccess $mode Resource mode for stream target.
-     * @throws InvalidArgumentException for invalid streams or resources.
-     */
-    private function setStream($stream, FileAccess $mode = null)
-    {
-        if($mode == null) {
-            $mode = FileAccess::READ_FROM_BEGIN;
-        }
-
-        $error    = null;
-        $resource = $stream;
-
-        if (is_string($stream)) {
-            set_error_handler(function ($e) use (&$error) {
-                if ($e !== E_WARNING) {
-                    return;
-                }
-
-                $error = $e;
-            });
-            $resource = fopen($stream, $mode);
-            restore_error_handler();
-        }
-
-        if ($error) {
-            throw new InvalidArgumentException('Invalid stream reference provided');
-        }
-
-        if (! is_resource($resource) || 'stream' !== get_resource_type($resource)) {
-            throw new InvalidArgumentException(
-                'Invalid stream provided; must be a string stream identifier or stream resource'
-            );
-        }
-
-        if ($stream !== $resource) {
-            $this->stream = $stream;
-        }
-
-        $this->resource = $resource;
     }
 }

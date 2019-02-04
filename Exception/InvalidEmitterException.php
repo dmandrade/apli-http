@@ -4,10 +4,10 @@
  *
  *  This file is part of the apli project.
  *
- *  @project apli
- *  @file InvalidEmitterException.php
- *  @author Danilo Andrade <danilo@webbingbrasil.com.br>
- *  @date 04/09/18 at 10:52
+ * @project apli
+ * @file InvalidEmitterException.php
+ * @author Danilo Andrade <danilo@webbingbrasil.com.br>
+ * @date 04/09/18 at 10:52
  */
 
 /**
@@ -19,8 +19,8 @@
 
 namespace Apli\Http\Exception;
 
-use Apli\Http\Emitter\EmitterStack;
 use Apli\Http\Emitter\EmitterInterface;
+use Apli\Http\Emitter\EmitterStack;
 use InvalidArgumentException;
 
 class InvalidEmitterException extends InvalidArgumentException

@@ -4,10 +4,10 @@
  *
  *  This file is part of the apli project.
  *
- *  @project apli
- *  @file StreamMode.php
- *  @author Danilo Andrade <danilo@webbingbrasil.com.br>
- *  @date 04/09/18 at 08:44
+ * @project apli
+ * @file StreamMode.php
+ * @author Danilo Andrade <danilo@webbingbrasil.com.br>
+ * @date 04/09/18 at 08:44
  */
 
 /**
@@ -32,7 +32,7 @@ class FileAccess extends AbstractEnum
 
     const READ_FROM_BEGIN = 'r';
     const WRITE_FROM_BEGIN = 'w';
-    const READ_WRITE_FROM_BEGIN=  'w+';
+    const READ_WRITE_FROM_BEGIN = 'w+';
     const WRITE_FROM_END = 'a';
     const READ_WRITE_FROM_END = 'a+';
     const BINARY_READ_FROM_BEGIN = 'rb';

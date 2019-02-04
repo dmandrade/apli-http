@@ -4,10 +4,10 @@
  *
  *  This file is part of the apli project.
  *
- *  @project apli
- *  @file EmitterException.php
- *  @author Danilo Andrade <danilo@webbingbrasil.com.br>
- *  @date 04/09/18 at 12:05
+ * @project apli
+ * @file EmitterException.php
+ * @author Danilo Andrade <danilo@webbingbrasil.com.br>
+ * @date 04/09/18 at 12:05
  */
 
 /**

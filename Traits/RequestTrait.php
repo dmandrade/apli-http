@@ -4,11 +4,12 @@
  *
  *  This file is part of the apli project.
  *
- *  @project apli
- *  @file RequestTrait.php
- *  @author Danilo Andrade <danilo@webbingbrasil.com.br>
- *  @date 03/09/18 at 18:29
+ * @project apli
+ * @file RequestTrait.php
+ * @author Danilo Andrade <danilo@webbingbrasil.com.br>
+ * @date 03/09/18 at 18:29
  */
+
 namespace Apli\Http\Traits;
 
 use Apli\Uri\Url;
@@ -47,59 +48,6 @@ trait RequestTrait
     protected $uri;
 
     /**
-     * Initialize request state.
-     *
-     * Used by constructors.
-     *
-     * @param null|string|Uri $uri URI for the request, if any.
-     * @param null|string $method HTTP method for the request, if any.
-     * @param string|resource|StreamInterface $body Message body, if any.
-     * @param array $headers Headers for the message, if any.
-     * @throws InvalidArgumentException for any invalid value.
-     */
-    private function initialize($uri = null, $method = null, $body = 'php://memory', array $headers = [])
-    {
-        $this->validateMethod($method);
-
-        $this->method = $method ?: '';
-        $this->uri    = $this->createUri($uri);
-        $this->stream = $this->getStream($body, 'wb+');
-
-        $this->setHeaders($headers);
-
-        // per PSR-7: attempt to set the Host header from a provided URI if no
-        // Host header is provided
-        if (! $this->hasHeader('Host') && $this->uri->getHost()) {
-            $this->headerNames['host'] = 'Host';
-            $this->headers['Host'] = [$this->getHostFromUri()];
-        }
-    }
-
-    /**
-     * Create and return a URI instance.
-     *
-     * If `$uri` is a already a `Uri` instance, returns it.
-     *
-     * If `$uri` is a string, passes it to the `Uri` constructor to return an
-     * instance.
-     *
-     * If `$uri is null, creates and returns an empty `Uri` instance.
-     *
-     * Otherwise, it raises an exception.
-     *
-     * @param null|string|Uri $uri
-     * @return UriInterface
-     */
-    private function createUri($uri)
-    {
-        if ($uri instanceof UriInterface) {
-            return $uri;
-        }
-
-        return Url::createFromString($uri);
-    }
-
-    /**
      * Retrieves the message's request target.
      *
      * Retrieves the message's request-target either as it will appear (for
@@ -123,7 +71,7 @@ trait RequestTrait
 
         $target = $this->uri->getPath();
         if ($this->uri->getQuery()) {
-            $target .= '?' . $this->uri->getQuery();
+            $target .= '?'.$this->uri->getQuery();
         }
 
         if (empty($target)) {
@@ -233,7 +181,7 @@ trait RequestTrait
      *
      * @link http://tools.ietf.org/html/rfc3986#section-4.3
      * @param UriInterface $uri New request URI to use.
-     * @param bool $preserveHost Preserve the original state of the Host header.
+     * @param bool         $preserveHost Preserve the original state of the Host header.
      * @return static
      */
     public function withUri(UriInterface $uri, $preserveHost = false)
@@ -245,13 +193,13 @@ trait RequestTrait
             return $new;
         }
 
-        if (! $uri->getHost()) {
+        if (!$uri->getHost()) {
             return $new;
         }
 
         $host = $uri->getHost();
         if ($uri->getPort()) {
-            $host .= ':' . $uri->getPort();
+            $host .= ':'.$uri->getPort();
         }
 
         $new->headerNames['host'] = 'Host';
@@ -271,6 +219,35 @@ trait RequestTrait
     }
 
     /**
+     * Initialize request state.
+     *
+     * Used by constructors.
+     *
+     * @param null|string|Uri                 $uri URI for the request, if any.
+     * @param null|string                     $method HTTP method for the request, if any.
+     * @param string|resource|StreamInterface $body Message body, if any.
+     * @param array                           $headers Headers for the message, if any.
+     * @throws InvalidArgumentException for any invalid value.
+     */
+    private function initialize($uri = null, $method = null, $body = 'php://memory', array $headers = [])
+    {
+        $this->validateMethod($method);
+
+        $this->method = $method ?: '';
+        $this->uri = $this->createUri($uri);
+        $this->stream = $this->getStream($body, 'wb+');
+
+        $this->setHeaders($headers);
+
+        // per PSR-7: attempt to set the Host header from a provided URI if no
+        // Host header is provided
+        if (!$this->hasHeader('Host') && $this->uri->getHost()) {
+            $this->headerNames['host'] = 'Host';
+            $this->headers['Host'] = [$this->getHostFromUri()];
+        }
+    }
+
+    /**
      * Validate the HTTP method
      *
      * @param null|string $method
@@ -282,19 +259,43 @@ trait RequestTrait
             return;
         }
 
-        if (! is_string($method)) {
+        if (!is_string($method)) {
             throw new InvalidArgumentException(sprintf(
                 'Unsupported HTTP method; must be a string, received %s',
                 (is_object($method) ? get_class($method) : gettype($method))
             ));
         }
 
-        if (! preg_match('/^[!#$%&\'*+.^_`\|~0-9a-z-]+$/i', $method)) {
+        if (!preg_match('/^[!#$%&\'*+.^_`\|~0-9a-z-]+$/i', $method)) {
             throw new InvalidArgumentException(sprintf(
                 'Unsupported HTTP method "%s" provided',
                 $method
             ));
         }
+    }
+
+    /**
+     * Create and return a URI instance.
+     *
+     * If `$uri` is a already a `Uri` instance, returns it.
+     *
+     * If `$uri` is a string, passes it to the `Uri` constructor to return an
+     * instance.
+     *
+     * If `$uri is null, creates and returns an empty `Uri` instance.
+     *
+     * Otherwise, it raises an exception.
+     *
+     * @param null|string|Uri $uri
+     * @return UriInterface
+     */
+    private function createUri($uri)
+    {
+        if ($uri instanceof UriInterface) {
+            return $uri;
+        }
+
+        return Url::createFromString($uri);
     }
 
     /**
@@ -304,8 +305,8 @@ trait RequestTrait
      */
     private function getHostFromUri()
     {
-        $host  = $this->uri->getHost();
-        $host .= $this->uri->getPort() ? ':' . $this->uri->getPort() : '';
+        $host = $this->uri->getHost();
+        $host .= $this->uri->getPort() ? ':'.$this->uri->getPort() : '';
         return $host;
     }
 }

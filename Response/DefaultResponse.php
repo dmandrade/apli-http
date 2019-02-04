@@ -4,10 +4,10 @@
  *
  *  This file is part of the apli project.
  *
- *  @project apli
- *  @file DefaultResponse.php
- *  @author Danilo Andrade <danilo@webbingbrasil.com.br>
- *  @date 04/09/18 at 11:55
+ * @project apli
+ * @file DefaultResponse.php
+ * @author Danilo Andrade <danilo@webbingbrasil.com.br>
+ * @date 04/09/18 at 11:55
  */
 
 /**
@@ -20,9 +20,9 @@
 namespace Apli\Http\Response;
 
 use Apli\Http\Stream\FileAccess;
+use Apli\Http\Traits\MessageTrait;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
-use Apli\Http\Traits\MessageTrait;
 
 class DefaultResponse implements ResponseInterface
 {
@@ -122,8 +122,8 @@ class DefaultResponse implements ResponseInterface
 
     /**
      * @param string|resource|StreamInterface $body Stream identifier and/or actual stream resource
-     * @param int $status Status code for the response, if any.
-     * @param array $headers Headers for the response, if any.
+     * @param int                             $status Status code for the response, if any.
+     * @param array                           $headers Headers for the response, if any.
      * @throws InvalidArgumentException on any invalid element.
      */
     public function __construct($body = 'php://memory', $status = 200, array $headers = [])
@@ -131,6 +131,43 @@ class DefaultResponse implements ResponseInterface
         $this->setStatusCode($status);
         $this->stream = $this->getStream($body, FileAccess::BINARY_READ_WRITE_FROM_BEGIN());
         $this->setHeaders($headers);
+    }
+
+    /**
+     * Set a valid status code.
+     *
+     * @param int    $code
+     * @param string $reasonPhrase
+     * @throws InvalidArgumentException on an invalid status code.
+     */
+    private function setStatusCode($code, $reasonPhrase = '')
+    {
+        if (!is_numeric($code)
+            || is_float($code)
+            || $code < static::MIN_STATUS_CODE_VALUE
+            || $code > static::MAX_STATUS_CODE_VALUE
+        ) {
+            throw new InvalidArgumentException(sprintf(
+                'Invalid status code "%s"; must be an integer between %d and %d, inclusive',
+                is_scalar($code) ? $code : gettype($code),
+                static::MIN_STATUS_CODE_VALUE,
+                static::MAX_STATUS_CODE_VALUE
+            ));
+        }
+
+        if (!is_string($reasonPhrase)) {
+            throw new InvalidArgumentException(sprintf(
+                'Unsupported response reason phrase; must be a string, received %s',
+                is_object($reasonPhrase) ? get_class($reasonPhrase) : gettype($reasonPhrase)
+            ));
+        }
+
+        if ($reasonPhrase === '' && isset($this->phrases[$code])) {
+            $reasonPhrase = $this->phrases[$code];
+        }
+
+        $this->reasonPhrase = $reasonPhrase;
+        $this->statusCode = (int)$code;
     }
 
     /**
@@ -157,42 +194,5 @@ class DefaultResponse implements ResponseInterface
         $new = clone $this;
         $new->setStatusCode($code, $reasonPhrase);
         return $new;
-    }
-
-    /**
-     * Set a valid status code.
-     *
-     * @param int $code
-     * @param string $reasonPhrase
-     * @throws InvalidArgumentException on an invalid status code.
-     */
-    private function setStatusCode($code, $reasonPhrase = '')
-    {
-        if (! is_numeric($code)
-            || is_float($code)
-            || $code < static::MIN_STATUS_CODE_VALUE
-            || $code > static::MAX_STATUS_CODE_VALUE
-        ) {
-            throw new InvalidArgumentException(sprintf(
-                'Invalid status code "%s"; must be an integer between %d and %d, inclusive',
-                is_scalar($code) ? $code : gettype($code),
-                static::MIN_STATUS_CODE_VALUE,
-                static::MAX_STATUS_CODE_VALUE
-            ));
-        }
-
-        if (! is_string($reasonPhrase)) {
-            throw new InvalidArgumentException(sprintf(
-                'Unsupported response reason phrase; must be a string, received %s',
-                is_object($reasonPhrase) ? get_class($reasonPhrase) : gettype($reasonPhrase)
-            ));
-        }
-
-        if ($reasonPhrase === '' && isset($this->phrases[$code])) {
-            $reasonPhrase = $this->phrases[$code];
-        }
-
-        $this->reasonPhrase = $reasonPhrase;
-        $this->statusCode = (int) $code;
     }
 }

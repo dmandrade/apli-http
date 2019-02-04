@@ -4,19 +4,19 @@
  *
  *  This file is part of the apli project.
  *
- *  @project apli
- *  @file ServerRequest.php
- *  @author Danilo Andrade <danilo@webbingbrasil.com.br>
- *  @date 30/06/18 at 13:11
+ * @project apli
+ * @file ServerRequest.php
+ * @author Danilo Andrade <danilo@webbingbrasil.com.br>
+ * @date 30/06/18 at 13:11
  */
 
 namespace Apli\Http;
 
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\UploadedFileInterface;
 use Apli\Http\Stream\PhpInputStream;
 use Apli\Http\Traits\RequestTrait;
 use InvalidArgumentException;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UploadedFileInterface;
 
 /**
  * Server-side HTTP request
@@ -67,16 +67,16 @@ class DefaultServerRequest implements ServerRequestInterface
     protected $uploadedFiles;
 
     /**
-     * @param array $serverParams Server parameters, typically from $_SERVER
-     * @param array $uploadedFiles Upload file information, a tree of UploadedFiles
-     * @param null|string|UriInterface $uri URI for the request, if any.
-     * @param null|string $method HTTP method for the request, if any.
+     * @param array                           $serverParams Server parameters, typically from $_SERVER
+     * @param array                           $uploadedFiles Upload file information, a tree of UploadedFiles
+     * @param null|string|UriInterface        $uri URI for the request, if any.
+     * @param null|string                     $method HTTP method for the request, if any.
      * @param string|resource|StreamInterface $body Message body, if any.
-     * @param array $headers Headers for the message, if any.
-     * @param array $cookies Cookies for the message, if any.
-     * @param array $queryParams Query params for the message, if any.
-     * @param null|array|object $parsedBody The deserialized body parameters, if any.
-     * @param string $protocol HTTP protocol version.
+     * @param array                           $headers Headers for the message, if any.
+     * @param array                           $cookies Cookies for the message, if any.
+     * @param array                           $queryParams Query params for the message, if any.
+     * @param null|array|object               $parsedBody The deserialized body parameters, if any.
+     * @param string                          $protocol HTTP protocol version.
      * @throws InvalidArgumentException for any invalid value.
      */
     public function __construct(
@@ -90,7 +90,8 @@ class DefaultServerRequest implements ServerRequestInterface
         array $queryParams = [],
         $parsedBody = null,
         $protocol = '1.1'
-    ) {
+    )
+    {
         $this->validateUploadedFiles($uploadedFiles);
 
         if ($body === 'php://input') {
@@ -98,12 +99,32 @@ class DefaultServerRequest implements ServerRequestInterface
         }
 
         $this->initialize($uri, $method, $body, $headers);
-        $this->serverParams  = $serverParams;
+        $this->serverParams = $serverParams;
         $this->uploadedFiles = $uploadedFiles;
-        $this->cookieParams  = $cookies;
-        $this->queryParams   = $queryParams;
-        $this->parsedBody    = $parsedBody;
-        $this->protocol      = $protocol;
+        $this->cookieParams = $cookies;
+        $this->queryParams = $queryParams;
+        $this->parsedBody = $parsedBody;
+        $this->protocol = $protocol;
+    }
+
+    /**
+     * Recursively validate the structure in an uploaded files array.
+     *
+     * @param array $uploadedFiles
+     * @throws InvalidArgumentException if any leaf is not an UploadedFileInterface instance.
+     */
+    private function validateUploadedFiles(array $uploadedFiles)
+    {
+        foreach ($uploadedFiles as $file) {
+            if (is_array($file)) {
+                $this->validateUploadedFiles($file);
+                continue;
+            }
+
+            if (!$file instanceof UploadedFileInterface) {
+                throw new InvalidArgumentException('Invalid leaf in uploaded files structure');
+            }
+        }
     }
 
     /**
@@ -200,7 +221,7 @@ class DefaultServerRequest implements ServerRequestInterface
      */
     public function getAttribute($attribute, $default = null)
     {
-        if (! array_key_exists($attribute, $this->attributes)) {
+        if (!array_key_exists($attribute, $this->attributes)) {
             return $default;
         }
 
@@ -261,25 +282,5 @@ class DefaultServerRequest implements ServerRequestInterface
         $new = clone $this;
         $new->method = $method;
         return $new;
-    }
-
-    /**
-     * Recursively validate the structure in an uploaded files array.
-     *
-     * @param array $uploadedFiles
-     * @throws InvalidArgumentException if any leaf is not an UploadedFileInterface instance.
-     */
-    private function validateUploadedFiles(array $uploadedFiles)
-    {
-        foreach ($uploadedFiles as $file) {
-            if (is_array($file)) {
-                $this->validateUploadedFiles($file);
-                continue;
-            }
-
-            if (! $file instanceof UploadedFileInterface) {
-                throw new InvalidArgumentException('Invalid leaf in uploaded files structure');
-            }
-        }
     }
 }

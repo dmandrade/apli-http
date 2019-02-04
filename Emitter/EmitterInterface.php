@@ -4,10 +4,10 @@
  *
  *  This file is part of the apli project.
  *
- *  @project apli
- *  @file EmitterInterface.php
- *  @author Danilo Andrade <danilo@webbingbrasil.com.br>
- *  @date 03/02/19 at 20:41
+ * @project apli
+ * @file EmitterInterface.php
+ * @author Danilo Andrade <danilo@webbingbrasil.com.br>
+ * @date 03/02/19 at 20:41
  */
 
 /**

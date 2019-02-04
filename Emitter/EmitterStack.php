@@ -4,10 +4,10 @@
  *
  *  This file is part of the apli project.
  *
- *  @project apli
- *  @file EmitterStack.php
- *  @author Danilo Andrade <danilo@webbingbrasil.com.br>
- *  @date 04/09/18 at 10:47
+ * @project apli
+ * @file EmitterStack.php
+ * @author Danilo Andrade <danilo@webbingbrasil.com.br>
+ * @date 04/09/18 at 10:47
  */
 
 /**
@@ -46,28 +46,15 @@ class EmitterStack extends Stack implements EmitterInterface
     /**
      * Set an emitter on the stack by index.
      *
-     * @param mixed $index
+     * @param mixed            $index
      * @param EmitterInterface $emitter
      * @return void
      * @throws InvalidArgumentException if not an EmitterInterface instance
      */
     public function offsetSet($index, $emitter)
     {
-        $this->validateEmitter((array) $emitter);
+        $this->validateEmitter((array)$emitter);
         parent::offsetSet($index, $emitter);
-    }
-
-    /**
-     * Push an emitter to the stack.
-     *
-     * @param ...EmitterInterface $emitters
-     * @return void
-     * @throws InvalidArgumentException if not an EmitterInterface instance
-     */
-    public function push(...$emitters)
-    {
-        $this->validateEmitter($emitters);
-        parent::push(...$emitters);
     }
 
     /**
@@ -83,5 +70,18 @@ class EmitterStack extends Stack implements EmitterInterface
                 throw InvalidEmitterException::forEmitter($emitter);
             }
         }
+    }
+
+    /**
+     * Push an emitter to the stack.
+     *
+     * @param ...EmitterInterface $emitters
+     * @return void
+     * @throws InvalidArgumentException if not an EmitterInterface instance
+     */
+    public function push(...$emitters)
+    {
+        $this->validateEmitter($emitters);
+        parent::push(...$emitters);
     }
 }

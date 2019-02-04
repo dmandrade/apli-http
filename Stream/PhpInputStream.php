@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2018 Danilo Andrade
+ *  Copyright (c) 2018 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file PhpInputStream.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 03/09/18 at 18:33
  */
@@ -14,15 +15,13 @@
  * Created by PhpStorm.
  * User: Danilo
  * Date: 03/09/2018
- * Time: 18:33
+ * Time: 18:33.
  */
 
 namespace Apli\Http\Stream;
 
-
 class PhpInputStream extends DefaultStream
 {
-
     /**
      * @var string
      */
@@ -34,7 +33,7 @@ class PhpInputStream extends DefaultStream
     private $reachedEof = false;
 
     /**
-     * @param  string|resource $stream
+     * @param string|resource $stream
      */
     public function __construct($stream = 'php://input')
     {
@@ -51,6 +50,7 @@ class PhpInputStream extends DefaultStream
         }
 
         $this->getContents();
+
         return $this->cache;
     }
 

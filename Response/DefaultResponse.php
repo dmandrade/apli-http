@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2018 Danilo Andrade
+ *  Copyright (c) 2018 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file DefaultResponse.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 04/09/18 at 11:55
  */
@@ -14,7 +15,7 @@
  * Created by PhpStorm.
  * User: Danilo
  * Date: 04/09/2018
- * Time: 11:55
+ * Time: 11:55.
  */
 
 namespace Apli\Http\Response;
@@ -32,7 +33,7 @@ class DefaultResponse implements ResponseInterface
     const MAX_STATUS_CODE_VALUE = 599;
 
     /**
-     * Map of standard HTTP status code/reason phrases
+     * Map of standard HTTP status code/reason phrases.
      *
      * @var array
      */
@@ -121,9 +122,10 @@ class DefaultResponse implements ResponseInterface
     private $statusCode;
 
     /**
-     * @param string|resource|StreamInterface $body Stream identifier and/or actual stream resource
-     * @param int                             $status Status code for the response, if any.
+     * @param string|resource|StreamInterface $body    Stream identifier and/or actual stream resource
+     * @param int                             $status  Status code for the response, if any.
      * @param array                           $headers Headers for the response, if any.
+     *
      * @throws InvalidArgumentException on any invalid element.
      */
     public function __construct($body = 'php://memory', $status = 200, array $headers = [])
@@ -138,6 +140,7 @@ class DefaultResponse implements ResponseInterface
      *
      * @param int    $code
      * @param string $reasonPhrase
+     *
      * @throws InvalidArgumentException on an invalid status code.
      */
     private function setStatusCode($code, $reasonPhrase = '')
@@ -167,7 +170,7 @@ class DefaultResponse implements ResponseInterface
         }
 
         $this->reasonPhrase = $reasonPhrase;
-        $this->statusCode = (int)$code;
+        $this->statusCode = (int) $code;
     }
 
     /**
@@ -193,6 +196,7 @@ class DefaultResponse implements ResponseInterface
     {
         $new = clone $this;
         $new->setStatusCode($code, $reasonPhrase);
+
         return $new;
     }
 }

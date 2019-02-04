@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2018 Danilo Andrade
+ *  Copyright (c) 2018 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file AbstractStream.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 03/09/18 at 18:33
  */
@@ -14,11 +15,10 @@
  * Created by PhpStorm.
  * User: Danilo
  * Date: 03/09/2018
- * Time: 18:33
+ * Time: 18:33.
  */
 
 namespace Apli\Http\Stream;
-
 
 use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
@@ -28,7 +28,6 @@ use const SEEK_SET;
 
 class DefaultStream implements StreamInterface
 {
-
     /**
      * @var resource|null
      */
@@ -41,7 +40,8 @@ class DefaultStream implements StreamInterface
 
     /**
      * @param string|resource $stream
-     * @param FileAccess      $mode Mode with which to open stream
+     * @param FileAccess      $mode   Mode with which to open stream
+     *
      * @throws InvalidArgumentException
      */
     public function __construct($stream, FileAccess $mode = null)
@@ -53,7 +53,8 @@ class DefaultStream implements StreamInterface
      * Set the internal stream resource.
      *
      * @param string|resource $stream String stream target or stream resource.
-     * @param FileAccess      $mode Resource mode for stream target.
+     * @param FileAccess      $mode   Resource mode for stream target.
+     *
      * @throws InvalidArgumentException for invalid streams or resources.
      */
     private function setStream($stream, FileAccess $mode = null)
@@ -126,7 +127,7 @@ class DefaultStream implements StreamInterface
         $meta = stream_get_meta_data($this->resource);
         $mode = $meta['mode'];
 
-        return (strstr($mode, 'r') || strstr($mode, '+'));
+        return strstr($mode, 'r') || strstr($mode, '+');
     }
 
     /**
@@ -139,6 +140,7 @@ class DefaultStream implements StreamInterface
         }
 
         $meta = stream_get_meta_data($this->resource);
+
         return $meta['seekable'];
     }
 
@@ -185,6 +187,7 @@ class DefaultStream implements StreamInterface
         if (false === $result) {
             throw new RuntimeException('Error reading from stream');
         }
+
         return $result;
     }
 
@@ -208,6 +211,7 @@ class DefaultStream implements StreamInterface
     {
         $resource = $this->resource;
         $this->resource = null;
+
         return $resource;
     }
 
@@ -216,8 +220,9 @@ class DefaultStream implements StreamInterface
      *
      * @param string|resource $resource
      * @param FileAccess      $mode
+     *
      * @throws InvalidArgumentException for stream identifier that cannot be
-     *     cast to a resource
+     *                                  cast to a resource
      * @throws InvalidArgumentException for non-resource stream
      */
     public function attach($resource, FileAccess $mode = null)
@@ -231,15 +236,13 @@ class DefaultStream implements StreamInterface
     public function getSize()
     {
         if (null === $this->resource) {
-            return null;
+            return;
         }
 
         $stats = fstat($this->resource);
         if ($stats !== false) {
             return $stats['size'];
         }
-
-        return null;
     }
 
     /**
@@ -289,6 +292,7 @@ class DefaultStream implements StreamInterface
         if (false === $result) {
             throw new RuntimeException('Error writing to stream');
         }
+
         return $result;
     }
 
@@ -304,13 +308,12 @@ class DefaultStream implements StreamInterface
         $meta = stream_get_meta_data($this->resource);
         $mode = $meta['mode'];
 
-        return (
+        return
             strstr($mode, 'x')
             || strstr($mode, 'w')
             || strstr($mode, 'c')
             || strstr($mode, 'a')
-            || strstr($mode, '+')
-        );
+            || strstr($mode, '+');
     }
 
     /**
@@ -346,7 +349,7 @@ class DefaultStream implements StreamInterface
 
         $metadata = stream_get_meta_data($this->resource);
         if (!array_key_exists($key, $metadata)) {
-            return null;
+            return;
         }
 
         return $metadata[$key];

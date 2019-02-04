@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2018 Danilo Andrade
+ *  Copyright (c) 2018 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file RequestTrait.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 03/09/18 at 18:29
  */
@@ -95,9 +96,12 @@ trait RequestTrait
      *
      * @link http://tools.ietf.org/html/rfc7230#section-2.7 (for the various
      *     request-target forms allowed in request messages)
+     *
      * @param mixed $requestTarget
-     * @return static
+     *
      * @throws InvalidArgumentException if the request target is invalid.
+     *
+     * @return static
      */
     public function withRequestTarget($requestTarget)
     {
@@ -109,6 +113,7 @@ trait RequestTrait
 
         $new = clone $this;
         $new->requestTarget = $requestTarget;
+
         return $new;
     }
 
@@ -134,14 +139,17 @@ trait RequestTrait
      * changed request method.
      *
      * @param string $method Case-insensitive method.
-     * @return static
+     *
      * @throws InvalidArgumentException for invalid HTTP methods.
+     *
+     * @return static
      */
     public function withMethod($method)
     {
         $this->validateMethod($method);
         $new = clone $this;
         $new->method = $method;
+
         return $new;
     }
 
@@ -151,8 +159,9 @@ trait RequestTrait
      * This method MUST return a Uri instance.
      *
      * @link http://tools.ietf.org/html/rfc3986#section-4.3
+     *
      * @return Uri Returns a Uri instance
-     *     representing the URI of the request, if any.
+     *             representing the URI of the request, if any.
      */
     public function getUri()
     {
@@ -180,8 +189,10 @@ trait RequestTrait
      * new Uri instance.
      *
      * @link http://tools.ietf.org/html/rfc3986#section-4.3
-     * @param UriInterface $uri New request URI to use.
+     *
+     * @param UriInterface $uri          New request URI to use.
      * @param bool         $preserveHost Preserve the original state of the Host header.
+     *
      * @return static
      */
     public function withUri(UriInterface $uri, $preserveHost = false)
@@ -223,10 +234,11 @@ trait RequestTrait
      *
      * Used by constructors.
      *
-     * @param null|string|Uri                 $uri URI for the request, if any.
-     * @param null|string                     $method HTTP method for the request, if any.
-     * @param string|resource|StreamInterface $body Message body, if any.
+     * @param null|string|Uri                 $uri     URI for the request, if any.
+     * @param null|string                     $method  HTTP method for the request, if any.
+     * @param string|resource|StreamInterface $body    Message body, if any.
      * @param array                           $headers Headers for the message, if any.
+     *
      * @throws InvalidArgumentException for any invalid value.
      */
     private function initialize($uri = null, $method = null, $body = 'php://memory', array $headers = [])
@@ -248,9 +260,10 @@ trait RequestTrait
     }
 
     /**
-     * Validate the HTTP method
+     * Validate the HTTP method.
      *
      * @param null|string $method
+     *
      * @throws InvalidArgumentException on invalid HTTP method.
      */
     private function validateMethod($method)
@@ -287,6 +300,7 @@ trait RequestTrait
      * Otherwise, it raises an exception.
      *
      * @param null|string|Uri $uri
+     *
      * @return UriInterface
      */
     private function createUri($uri)
@@ -299,7 +313,7 @@ trait RequestTrait
     }
 
     /**
-     * Retrieve the host from the URI instance
+     * Retrieve the host from the URI instance.
      *
      * @return string
      */
@@ -307,6 +321,7 @@ trait RequestTrait
     {
         $host = $this->uri->getHost();
         $host .= $this->uri->getPort() ? ':'.$this->uri->getPort() : '';
+
         return $host;
     }
 }

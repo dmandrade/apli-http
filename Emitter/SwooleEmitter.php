@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2019 Danilo Andrade
+ *  Copyright (c) 2019 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file SwooleEmitter.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 03/02/19 at 20:53
  */
@@ -14,7 +15,7 @@
  * Created by PhpStorm.
  * User: Danilo
  * Date: 03/02/2019
- * Time: 20:53
+ * Time: 20:53.
  */
 
 namespace Apli\Http\Emitter;
@@ -43,7 +44,7 @@ class SwooleEmitter extends AbstractSapiEmitter
      * Create a new SwooleEmitter instance.
      *
      * @param \Swoole\Http\Response $swooleResponse
-     * @param int                   $chunkSize default is 2MB
+     * @param int                   $chunkSize      default is 2MB
      */
     public function __construct(SwooleResponse $swooleResponse, int $chunkSize = 2097152)
     {
@@ -97,6 +98,7 @@ class SwooleEmitter extends AbstractSapiEmitter
         $body->rewind();
         if ($body->getSize() <= $this->chunkSize) {
             $this->swooleResponse->end($body->getContents());
+
             return;
         }
         while (!$body->eof()) {

@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2018 Danilo Andrade
+ *  Copyright (c) 2018 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file StreamMode.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 04/09/18 at 08:44
  */
@@ -14,17 +15,15 @@
  * Created by PhpStorm.
  * User: Danilo
  * Date: 04/09/2018
- * Time: 08:44
+ * Time: 08:44.
  */
 
 namespace Apli\Http\Stream;
 
-
 use Apli\Support\AbstractEnum;
 
 /**
- * Class FileAccess
- * @package Apli\Http\Stream
+ * Class FileAccess.
  */
 class FileAccess extends AbstractEnum
 {

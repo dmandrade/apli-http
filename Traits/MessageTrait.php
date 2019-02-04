@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2018 Danilo Andrade
+ *  Copyright (c) 2018 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file MessageTrait.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 03/09/18 at 18:29
  */
@@ -70,6 +71,7 @@ trait MessageTrait
      * new protocol version.
      *
      * @param string $version HTTP protocol version
+     *
      * @return static
      */
     public function withProtocolVersion($version)
@@ -77,13 +79,15 @@ trait MessageTrait
         $this->validateProtocolVersion($version);
         $new = clone $this;
         $new->protocol = $version;
+
         return $new;
     }
 
     /**
-     * Validate the HTTP protocol version
+     * Validate the HTTP protocol version.
      *
      * @param string $version
+     *
      * @throws InvalidArgumentException on invalid HTTP protocol version
      */
     private function validateProtocolVersion($version)
@@ -129,7 +133,7 @@ trait MessageTrait
      *     }
      *
      * @return array Returns an associative array of the message's headers. Each
-     *     key MUST be a header name, and each value MUST be an array of strings.
+     *               key MUST be a header name, and each value MUST be an array of strings.
      */
     public function getHeaders()
     {
@@ -175,9 +179,10 @@ trait MessageTrait
      * an empty string.
      *
      * @param string $name Case-insensitive header field name.
+     *
      * @return string A string of values as provided for the given header
-     *    concatenated together using a comma. If the header does not appear in
-     *    the message, this method MUST return an empty string.
+     *                concatenated together using a comma. If the header does not appear in
+     *                the message, this method MUST return an empty string.
      */
     public function getHeaderLine($name)
     {
@@ -199,9 +204,10 @@ trait MessageTrait
      * empty array.
      *
      * @param string $header Case-insensitive header field name.
+     *
      * @return string[] An array of string values as provided for the given
-     *    header. If the header does not appear in the message, this method MUST
-     *    return an empty array.
+     *                  header. If the header does not appear in the message, this method MUST
+     *                  return an empty array.
      */
     public function getHeader($header)
     {
@@ -218,9 +224,10 @@ trait MessageTrait
      * Checks if a header exists by the given case-insensitive name.
      *
      * @param string $header Case-insensitive header name.
+     *
      * @return bool Returns true if any header names match the given header
-     *     name using a case-insensitive string comparison. Returns false if
-     *     no matching header name is found in the message.
+     *              name using a case-insensitive string comparison. Returns false if
+     *              no matching header name is found in the message.
      */
     public function hasHeader($header)
     {
@@ -240,9 +247,11 @@ trait MessageTrait
      * new header and/or value.
      *
      * @param string          $header Case-insensitive header field name to add.
-     * @param string|string[] $value Header value(s).
-     * @return static
+     * @param string|string[] $value  Header value(s).
+     *
      * @throws \InvalidArgumentException for invalid header names or values.
+     *
+     * @return static
      */
     public function withAddedHeader($header, $value)
     {
@@ -257,6 +266,7 @@ trait MessageTrait
         $new = clone $this;
         $value = $this->filterHeaderValue($value);
         $new->headers[$header] = array_merge($this->headers[$header], $value);
+
         return $new;
     }
 
@@ -284,9 +294,11 @@ trait MessageTrait
      * new and/or updated header and value.
      *
      * @param string          $header Case-insensitive header field name.
-     * @param string|string[] $value Header value(s).
-     * @return static
+     * @param string|string[] $value  Header value(s).
+     *
      * @throws \InvalidArgumentException for invalid header names or values.
+     *
+     * @return static
      */
     public function withHeader($header, $value)
     {
@@ -309,6 +321,7 @@ trait MessageTrait
 
     /**
      * @param mixed $values
+     *
      * @return string[]
      */
     private function filterHeaderValue($values)
@@ -320,7 +333,7 @@ trait MessageTrait
         return array_map(function ($value) {
             HeaderSecurity::assertValid($value);
 
-            return (string)$value;
+            return (string) $value;
         }, $values);
     }
 
@@ -334,6 +347,7 @@ trait MessageTrait
      * the named header.
      *
      * @param string $header Case-insensitive header field name to remove.
+     *
      * @return static
      */
     public function withoutHeader($header)
@@ -347,6 +361,7 @@ trait MessageTrait
 
         $new = clone $this;
         unset($new->headers[$original], $new->headerNames[$normalized]);
+
         return $new;
     }
 
@@ -370,19 +385,23 @@ trait MessageTrait
      * new body stream.
      *
      * @param StreamInterface $body Body.
-     * @return static
+     *
      * @throws \InvalidArgumentException When the body is not valid.
+     *
+     * @return static
      */
     public function withBody(StreamInterface $body)
     {
         $new = clone $this;
         $new->stream = $body;
+
         return $new;
     }
 
     /**
      * @param $stream
      * @param $modeIfNotInstance
+     *
      * @return StreamInterface
      */
     private function getStream($stream, $modeIfNotInstance)

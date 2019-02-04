@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2018 Danilo Andrade
+ *  Copyright (c) 2018 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file HeaderSecurity.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 03/09/18 at 18:47
  */
@@ -16,12 +17,12 @@ use InvalidArgumentException;
 
 /**
  * Provide security tools around HTTP headers to prevent common injection vectors.
- * @package Apli\Http
  */
 final class HeaderSecurity
 {
     /**
      * Private constructor; non-instantiable.
+     *
      * @codeCoverageIgnore
      */
     private function __construct()
@@ -29,7 +30,7 @@ final class HeaderSecurity
     }
 
     /**
-     * Filter a header value
+     * Filter a header value.
      *
      * Ensures CRLF header injection vectors are filtered.
      *
@@ -41,12 +42,14 @@ final class HeaderSecurity
      * lossy.
      *
      * @see http://en.wikipedia.org/wiki/HTTP_response_splitting
+     *
      * @param string $value
+     *
      * @return string
      */
     public static function filter($value)
     {
-        $value = (string)$value;
+        $value = (string) $value;
         $length = strlen($value);
         $string = '';
         for ($i = 0; $i < $length; $i += 1) {
@@ -86,6 +89,7 @@ final class HeaderSecurity
      * Assert a header value is valid.
      *
      * @param string $value
+     *
      * @throws InvalidArgumentException for invalid values
      */
     public static function assertValid($value)
@@ -112,12 +116,14 @@ final class HeaderSecurity
      * a single CRLF sequence followed by a space or horizontal tab.
      *
      * @see http://en.wikipedia.org/wiki/HTTP_response_splitting
+     *
      * @param string $value
+     *
      * @return bool
      */
     public static function isValid($value)
     {
-        $value = (string)$value;
+        $value = (string) $value;
 
         // Look for:
         // \n not preceded by \r, OR
@@ -145,7 +151,9 @@ final class HeaderSecurity
      * Assert whether or not a header name is valid.
      *
      * @see http://tools.ietf.org/html/rfc7230#section-3.2
+     *
      * @param mixed $name
+     *
      * @throws InvalidArgumentException
      */
     public static function assertValidName($name)

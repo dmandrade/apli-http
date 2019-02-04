@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2019 Danilo Andrade
+ *  Copyright (c) 2019 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file EmitterInterface.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 03/02/19 at 20:41
  */
@@ -14,7 +15,7 @@
  * Created by PhpStorm.
  * User: Danilo
  * Date: 03/02/2019
- * Time: 20:41
+ * Time: 20:41.
  */
 
 namespace Apli\Http\Emitter;
@@ -23,7 +24,6 @@ use Psr\Http\Message\ResponseInterface;
 
 interface EmitterInterface
 {
-
     /**
      * Emit a response.
      *

@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2019 Danilo Andrade
+ *  Copyright (c) 2019 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file SapiStreamEmitter.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 03/02/19 at 20:52
  */
@@ -14,7 +15,7 @@
  * Created by PhpStorm.
  * User: Danilo
  * Date: 03/02/2019
- * Time: 20:52
+ * Time: 20:52.
  */
 
 namespace Apli\Http\Emitter;
@@ -40,6 +41,7 @@ class SapiStreamEmitter extends AbstractSapiEmitter
     public function setMaxBufferLength(int $maxBufferLength)
     {
         $this->maxBufferLength = $maxBufferLength;
+
         return $this;
     }
 
@@ -75,12 +77,11 @@ class SapiStreamEmitter extends AbstractSapiEmitter
         if (\preg_match('/(?P<unit>[\w]+)\s+(?P<first>\d+)-(?P<last>\d+)\/(?P<length>\d+|\*)/', $header, $matches) === 1) {
             return [
                 $matches['unit'],
-                (int)$matches['first'],
-                (int)$matches['last'],
-                $matches['length'] === '*' ? '*' : (int)$matches['length'],
+                (int) $matches['first'],
+                (int) $matches['last'],
+                $matches['length'] === '*' ? '*' : (int) $matches['length'],
             ];
         }
-        return null;
     }
 
     /**
@@ -100,7 +101,8 @@ class SapiStreamEmitter extends AbstractSapiEmitter
             $first = 0;
         }
         if (!$body->isReadable()) {
-            echo \substr($body->getContents(), $first, (int)$length);
+            echo \substr($body->getContents(), $first, (int) $length);
+
             return;
         }
         $remaining = $length;
@@ -110,7 +112,7 @@ class SapiStreamEmitter extends AbstractSapiEmitter
             echo $contents;
         }
         if ($remaining > 0 && !$body->eof()) {
-            echo $body->read((int)$remaining);
+            echo $body->read((int) $remaining);
         }
     }
 
@@ -128,6 +130,7 @@ class SapiStreamEmitter extends AbstractSapiEmitter
         }
         if (!$body->isReadable()) {
             echo $body;
+
             return;
         }
         while (!$body->eof()) {

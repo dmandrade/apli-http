@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2018 Danilo Andrade
+ *  Copyright (c) 2018 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file DefaultUploadedFile.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 04/09/18 at 08:40
  */
@@ -14,11 +15,10 @@
  * Created by PhpStorm.
  * User: Danilo
  * Date: 04/09/2018
- * Time: 08:40
+ * Time: 08:40.
  */
 
 namespace Apli\Http;
-
 
 use Apli\Http\Stream\DefaultStream;
 use Apli\Http\Stream\FileAccess;
@@ -27,17 +27,16 @@ use Psr\Http\Message\UploadedFileInterface;
 
 class DefaultUploadedFile implements UploadedFileInterface
 {
-
     const ERROR_MESSAGES = [
-        UPLOAD_ERR_OK => 'There is no error, the file uploaded with success',
-        UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
+        UPLOAD_ERR_OK        => 'There is no error, the file uploaded with success',
+        UPLOAD_ERR_INI_SIZE  => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
         UPLOAD_ERR_FORM_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was '
             .'specified in the HTML form',
-        UPLOAD_ERR_PARTIAL => 'The uploaded file was only partially uploaded',
-        UPLOAD_ERR_NO_FILE => 'No file was uploaded',
+        UPLOAD_ERR_PARTIAL    => 'The uploaded file was only partially uploaded',
+        UPLOAD_ERR_NO_FILE    => 'No file was uploaded',
         UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder',
         UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
-        UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.',
+        UPLOAD_ERR_EXTENSION  => 'A PHP extension stopped the file upload.',
     ];
 
     /**
@@ -81,6 +80,7 @@ class DefaultUploadedFile implements UploadedFileInterface
      * @param int                    $errorStatus
      * @param string|null            $clientFilename
      * @param string|null            $clientMediaType
+     *
      * @throws InvalidArgumentException
      */
     public function __construct($streamOrFile, $size, $errorStatus, $clientFilename = null, $clientMediaType = null)
@@ -136,11 +136,13 @@ class DefaultUploadedFile implements UploadedFileInterface
      *
      * @see http://php.net/is_uploaded_file
      * @see http://php.net/move_uploaded_file
+     *
      * @param string $targetPath Path to which to move the uploaded file.
-     * @throws \RuntimeException if the upload was not successful.
+     *
+     * @throws \RuntimeException         if the upload was not successful.
      * @throws \InvalidArgumentException if the $path specified is invalid.
-     * @throws \RuntimeException on any error during the move operation, or on
-     *     the second or subsequent call to the method.
+     * @throws \RuntimeException         on any error during the move operation, or on
+     *                                   the second or subsequent call to the method.
      */
     public function moveTo($targetPath)
     {
@@ -171,7 +173,7 @@ class DefaultUploadedFile implements UploadedFileInterface
 
         $sapi = PHP_SAPI;
         switch (true) {
-            case (empty($sapi) || 0 === strpos($sapi, 'cli') || !$this->file):
+            case empty($sapi) || 0 === strpos($sapi, 'cli') || !$this->file:
                 // Non-SAPI environment, or no filename present
                 $this->writeFile($targetPath);
                 break;
@@ -187,7 +189,7 @@ class DefaultUploadedFile implements UploadedFileInterface
     }
 
     /**
-     * Write internal stream to given path
+     * Write internal stream to given path.
      *
      * @param string $path
      */
@@ -209,6 +211,7 @@ class DefaultUploadedFile implements UploadedFileInterface
 
     /**
      * {@inheritdoc}
+     *
      * @throws \RuntimeException if the upload was not successful.
      */
     public function getStream()
@@ -229,6 +232,7 @@ class DefaultUploadedFile implements UploadedFileInterface
         }
 
         $this->stream = new DefaultStream($this->file);
+
         return $this->stream;
     }
 
@@ -246,6 +250,7 @@ class DefaultUploadedFile implements UploadedFileInterface
      * {@inheritdoc}
      *
      * @see http://php.net/manual/en/features.file-upload.errors.php
+     *
      * @return int One of PHP's UPLOAD_ERR_XXX constants.
      */
     public function getError()
@@ -257,7 +262,7 @@ class DefaultUploadedFile implements UploadedFileInterface
      * {@inheritdoc}
      *
      * @return string|null The filename sent by the client or null if none
-     *     was provided.
+     *                     was provided.
      */
     public function getClientFilename()
     {

@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2018 Danilo Andrade
+ *  Copyright (c) 2018 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file ServerRequest.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 30/06/18 at 13:11
  */
@@ -19,7 +20,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 
 /**
- * Server-side HTTP request
+ * Server-side HTTP request.
  *
  * Extends the Request definition to add methods for accessing incoming data,
  * specifically server parameters, cookies, matched path parameters, query
@@ -67,16 +68,17 @@ class DefaultServerRequest implements ServerRequestInterface
     protected $uploadedFiles;
 
     /**
-     * @param array                           $serverParams Server parameters, typically from $_SERVER
+     * @param array                           $serverParams  Server parameters, typically from $_SERVER
      * @param array                           $uploadedFiles Upload file information, a tree of UploadedFiles
-     * @param null|string|UriInterface        $uri URI for the request, if any.
-     * @param null|string                     $method HTTP method for the request, if any.
-     * @param string|resource|StreamInterface $body Message body, if any.
-     * @param array                           $headers Headers for the message, if any.
-     * @param array                           $cookies Cookies for the message, if any.
-     * @param array                           $queryParams Query params for the message, if any.
-     * @param null|array|object               $parsedBody The deserialized body parameters, if any.
-     * @param string                          $protocol HTTP protocol version.
+     * @param null|string|UriInterface        $uri           URI for the request, if any.
+     * @param null|string                     $method        HTTP method for the request, if any.
+     * @param string|resource|StreamInterface $body          Message body, if any.
+     * @param array                           $headers       Headers for the message, if any.
+     * @param array                           $cookies       Cookies for the message, if any.
+     * @param array                           $queryParams   Query params for the message, if any.
+     * @param null|array|object               $parsedBody    The deserialized body parameters, if any.
+     * @param string                          $protocol      HTTP protocol version.
+     *
      * @throws InvalidArgumentException for any invalid value.
      */
     public function __construct(
@@ -90,8 +92,7 @@ class DefaultServerRequest implements ServerRequestInterface
         array $queryParams = [],
         $parsedBody = null,
         $protocol = '1.1'
-    )
-    {
+    ) {
         $this->validateUploadedFiles($uploadedFiles);
 
         if ($body === 'php://input') {
@@ -111,6 +112,7 @@ class DefaultServerRequest implements ServerRequestInterface
      * Recursively validate the structure in an uploaded files array.
      *
      * @param array $uploadedFiles
+     *
      * @throws InvalidArgumentException if any leaf is not an UploadedFileInterface instance.
      */
     private function validateUploadedFiles(array $uploadedFiles)
@@ -151,6 +153,7 @@ class DefaultServerRequest implements ServerRequestInterface
         $this->validateUploadedFiles($uploadedFiles);
         $new = clone $this;
         $new->uploadedFiles = $uploadedFiles;
+
         return $new;
     }
 
@@ -169,6 +172,7 @@ class DefaultServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         $new->cookieParams = $cookies;
+
         return $new;
     }
 
@@ -187,6 +191,7 @@ class DefaultServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         $new->queryParams = $query;
+
         return $new;
     }
 
@@ -205,6 +210,7 @@ class DefaultServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         $new->parsedBody = $data;
+
         return $new;
     }
 
@@ -235,6 +241,7 @@ class DefaultServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         $new->attributes[$attribute] = $value;
+
         return $new;
     }
 
@@ -245,6 +252,7 @@ class DefaultServerRequest implements ServerRequestInterface
     {
         $new = clone $this;
         unset($new->attributes[$attribute]);
+
         return $new;
     }
 
@@ -261,6 +269,7 @@ class DefaultServerRequest implements ServerRequestInterface
         if (empty($this->method)) {
             return 'GET';
         }
+
         return $this->method;
     }
 
@@ -274,6 +283,7 @@ class DefaultServerRequest implements ServerRequestInterface
      * This methods returns a new instance.
      *
      * @param string $method
+     *
      * @return self
      */
     public function withMethod($method)
@@ -281,6 +291,7 @@ class DefaultServerRequest implements ServerRequestInterface
         $this->validateMethod($method);
         $new = clone $this;
         $new->method = $method;
+
         return $new;
     }
 }

@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2018 Danilo Andrade
+ *  Copyright (c) 2018 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file EmitterStack.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 04/09/18 at 10:47
  */
@@ -14,11 +15,10 @@
  * Created by PhpStorm.
  * User: Danilo
  * Date: 04/09/2018
- * Time: 10:47
+ * Time: 10:47.
  */
 
 namespace Apli\Http\Emitter;
-
 
 use Apli\Data\Stack;
 use Apli\Http\Exception\InvalidEmitterException;
@@ -31,6 +31,7 @@ class EmitterStack extends Stack implements EmitterInterface
      * according to the environment.
      *
      * @param ResponseInterface $response
+     *
      * @return bool
      */
     public function emit(ResponseInterface $response)
@@ -40,6 +41,7 @@ class EmitterStack extends Stack implements EmitterInterface
                 return true;
             }
         }
+
         return false;
     }
 
@@ -48,12 +50,14 @@ class EmitterStack extends Stack implements EmitterInterface
      *
      * @param mixed            $index
      * @param EmitterInterface $emitter
-     * @return void
+     *
      * @throws InvalidArgumentException if not an EmitterInterface instance
+     *
+     * @return void
      */
     public function offsetSet($index, $emitter)
     {
-        $this->validateEmitter((array)$emitter);
+        $this->validateEmitter((array) $emitter);
         parent::offsetSet($index, $emitter);
     }
 
@@ -61,6 +65,7 @@ class EmitterStack extends Stack implements EmitterInterface
      * Validate that an emitter implements EmitterInterface.
      *
      * @param EmitterInterface[] $emitters
+     *
      * @throws InvalidEmitterException for non-emitter instances
      */
     private function validateEmitter($emitters)
@@ -76,8 +81,10 @@ class EmitterStack extends Stack implements EmitterInterface
      * Push an emitter to the stack.
      *
      * @param ...EmitterInterface $emitters
-     * @return void
+     *
      * @throws InvalidArgumentException if not an EmitterInterface instance
+     *
+     * @return void
      */
     public function push(...$emitters)
     {

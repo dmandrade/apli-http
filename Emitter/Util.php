@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2019 Danilo Andrade
+ *  Copyright (c) 2019 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file Util.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 03/02/19 at 20:55
  */
@@ -14,7 +15,7 @@
  * Created by PhpStorm.
  * User: Danilo
  * Date: 03/02/2019
- * Time: 20:55
+ * Time: 20:55.
  */
 
 namespace Apli\Http\Emitter;
@@ -23,7 +24,6 @@ use Psr\Http\Message\ResponseInterface;
 
 final class Util
 {
-
     /**
      * Private constructor; non-instantiable.
      *
@@ -47,8 +47,9 @@ final class Util
         if (!$response->hasHeader('Content-Length') &&
             $response->getBody()->getSize() !== null
         ) {
-            $response = $response->withHeader('Content-Length', (string)$response->getBody()->getSize());
+            $response = $response->withHeader('Content-Length', (string) $response->getBody()->getSize());
         }
+
         return $response;
     }
 
@@ -58,7 +59,7 @@ final class Util
      * Resulting level can be greater than target level if a non-removable buffer has been encountered.
      *
      * @param int  $maxBufferLevel The target output buffering level
-     * @param bool $flush Whether to flush or clean the buffers
+     * @param bool $flush          Whether to flush or clean the buffers
      *
      * @return void
      */
@@ -67,7 +68,7 @@ final class Util
         $status = \ob_get_status(true);
         $level = \count($status);
         $flags = \PHP_OUTPUT_HANDLER_REMOVABLE | ($flush ? \PHP_OUTPUT_HANDLER_FLUSHABLE : \PHP_OUTPUT_HANDLER_CLEANABLE);
-        while ($level-- > $maxBufferLevel && (bool)($s = $status[$level]) && ($s['del'] ?? !isset($s['flags']) || $flags === ($s['flags'] & $flags))) {
+        while ($level-- > $maxBufferLevel && (bool) ($s = $status[$level]) && ($s['del'] ?? !isset($s['flags']) || $flags === ($s['flags'] & $flags))) {
             if ($flush) {
                 \ob_end_flush();
             } else {

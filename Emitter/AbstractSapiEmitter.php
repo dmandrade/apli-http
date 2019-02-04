@@ -1,11 +1,12 @@
 <?php
 /**
- *  Copyright (c) 2019 Danilo Andrade
+ *  Copyright (c) 2019 Danilo Andrade.
  *
  *  This file is part of the apli project.
  *
  * @project apli
  * @file AbstractSapiEmitter.php
+ *
  * @author Danilo Andrade <danilo@webbingbrasil.com.br>
  * @date 03/02/19 at 20:46
  */
@@ -14,7 +15,7 @@
  * Created by PhpStorm.
  * User: Danilo
  * Date: 03/02/2019
- * Time: 20:46
+ * Time: 20:46.
  */
 
 namespace Apli\Http\Emitter;
@@ -110,6 +111,7 @@ abstract class AbstractSapiEmitter implements EmitterInterface
     {
         $filtered = \str_replace('-', ' ', $header);
         $filtered = \ucwords($filtered);
+
         return \str_replace(' ', '-', $filtered);
     }
 

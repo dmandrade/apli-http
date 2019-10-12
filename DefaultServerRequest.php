@@ -17,6 +17,7 @@ use Apli\Http\Stream\PhpInputStream;
 use Apli\Http\Traits\RequestTrait;
 use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
 
 /**
@@ -72,7 +73,7 @@ class DefaultServerRequest implements ServerRequestInterface
      * @param array                           $uploadedFiles Upload file information, a tree of UploadedFiles
      * @param null|string|UriInterface        $uri           URI for the request, if any.
      * @param null|string                     $method        HTTP method for the request, if any.
-     * @param string|resource|StreamInterface $body          Message body, if any.
+     * @param StreamInterface|string|resource $body          Message body, if any.
      * @param array                           $headers       Headers for the message, if any.
      * @param array                           $cookies       Cookies for the message, if any.
      * @param array                           $queryParams   Query params for the message, if any.

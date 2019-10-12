@@ -20,12 +20,12 @@
 
 namespace Apli\Http\Stream;
 
-use Apli\Support\AbstractEnum;
+use Apli\Support\Enum;
 
 /**
  * Class FileAccess.
  */
-class FileAccess extends AbstractEnum
+class FileAccess extends Enum
 {
     const __default = self::READ_FROM_BEGIN;
 

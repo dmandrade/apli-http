@@ -79,16 +79,16 @@ abstract class ServerRequestFactory
         }
 
         return new DefaultServerRequest(
+            self::marshalMethodFromSapi($server),
+            self::marshalUriFromSapi($server, $headers),
+            $headers,
+            'php://input',
+            self::marshalProtocolVersionFromSapi($server),
             $server,
             $files,
-            self::marshalUriFromSapi($server, $headers),
-            self::marshalMethodFromSapi($server),
-            'php://input',
-            $headers,
             $cookies ?: $_COOKIE,
             $query ?: $_GET,
-            $body ?: $_POST,
-            self::marshalProtocolVersionFromSapi($server)
+            $body ?: $_POST
         );
     }
 

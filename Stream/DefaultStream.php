@@ -109,7 +109,7 @@ class DefaultStream implements StreamInterface
                 $this->rewind();
             }
 
-            return $this->getContents();
+            return (string) $this->getContents();
         } catch (RuntimeException $e) {
             return '';
         }

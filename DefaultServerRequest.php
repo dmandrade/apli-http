@@ -14,6 +14,7 @@
 namespace Apli\Http;
 
 use Apli\Http\Stream\PhpInputStream;
+use Apli\Http\Traits\MessageTrait;
 use Apli\Http\Traits\RequestTrait;
 use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
@@ -36,6 +37,7 @@ use Psr\Http\Message\UploadedFileInterface;
  */
 class DefaultServerRequest implements ServerRequestInterface
 {
+    use MessageTrait;
     use RequestTrait;
 
     /**
@@ -69,34 +71,34 @@ class DefaultServerRequest implements ServerRequestInterface
     protected $uploadedFiles;
 
     /**
+     * @param null|string                     $method        HTTP method for the request, if any.
+     * @param null|string|UriInterface        $uri           URI for the request, if any.
+     * @param array                           $headers       Headers for the message, if any.
+     * @param StreamInterface|string|resource $body          Message body, if any.
+     * @param string                          $protocol      HTTP protocol version.
      * @param array                           $serverParams  Server parameters, typically from $_SERVER
      * @param array                           $uploadedFiles Upload file information, a tree of UploadedFiles
-     * @param null|string|UriInterface        $uri           URI for the request, if any.
-     * @param null|string                     $method        HTTP method for the request, if any.
-     * @param StreamInterface|string|resource $body          Message body, if any.
-     * @param array                           $headers       Headers for the message, if any.
      * @param array                           $cookies       Cookies for the message, if any.
      * @param array                           $queryParams   Query params for the message, if any.
      * @param null|array|object               $parsedBody    The deserialized body parameters, if any.
-     * @param string                          $protocol      HTTP protocol version.
      *
      * @throws InvalidArgumentException for any invalid value.
      */
     public function __construct(
+        $method = null,
+        $uri = null,
+        array $headers = [],
+        $body = 'php://input',
+        $protocol = '1.1',
         array $serverParams = [],
         array $uploadedFiles = [],
-        $uri = null,
-        $method = null,
-        $body = 'php://input',
-        array $headers = [],
         array $cookies = [],
         array $queryParams = [],
-        $parsedBody = null,
-        $protocol = '1.1'
+        $parsedBody = null
     ) {
         $this->validateUploadedFiles($uploadedFiles);
 
-        if ($body === 'php://input') {
+        if (null === $body || $body === 'php://input') {
             $body = new PhpInputStream();
         }
 

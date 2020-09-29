@@ -24,20 +24,23 @@ use Apli\Http\Stream\FileAccess;
 use Apli\Http\Traits\MessageTrait;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
+use function is_int;
+use function gettype;
+use function is_scalar;
 
 class DefaultResponse implements ResponseInterface
 {
     use MessageTrait;
 
-    const MIN_STATUS_CODE_VALUE = 100;
-    const MAX_STATUS_CODE_VALUE = 599;
+    public const MIN_STATUS_CODE_VALUE = 100;
+    public const MAX_STATUS_CODE_VALUE = 599;
 
     /**
      * Map of standard HTTP status code/reason phrases.
      *
      * @var array
      */
-    private $phrases = [
+    public const PHRASES =  [
         // INFORMATIONAL CODES
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -122,16 +125,16 @@ class DefaultResponse implements ResponseInterface
     private $statusCode;
 
     /**
-     * @param string|resource|StreamInterface $body    Stream identifier and/or actual stream resource
-     * @param int                             $status  Status code for the response, if any.
-     * @param array                           $headers Headers for the response, if any.
-     *
-     * @throws InvalidArgumentException on any invalid element.
+     * DefaultResponse constructor.
+     * @param int    $status
+     * @param array  $headers
+     * @param null   $body
+     * @param mixed $reasonPhrase
      */
-    public function __construct($body = 'php://memory', $status = 200, array $headers = [])
+    public function __construct(int $status = 200, array $headers = [], $body = 'php://memory', $reasonPhrase = null)
     {
-        $this->setStatusCode($status);
         $this->stream = $this->getStream($body, FileAccess::BINARY_READ_WRITE_FROM_BEGIN());
+        $this->setStatusCode($status, $reasonPhrase);
         $this->setHeaders($headers);
     }
 
@@ -143,10 +146,9 @@ class DefaultResponse implements ResponseInterface
      *
      * @throws InvalidArgumentException on an invalid status code.
      */
-    private function setStatusCode($code, $reasonPhrase = '')
+    private function setStatusCode($code, $reasonPhrase = null): void
     {
-        if (!is_numeric($code)
-            || is_float($code)
+        if (!is_int($code)
             || $code < static::MIN_STATUS_CODE_VALUE
             || $code > static::MAX_STATUS_CODE_VALUE
         ) {
@@ -158,19 +160,12 @@ class DefaultResponse implements ResponseInterface
             ));
         }
 
-        if (!is_string($reasonPhrase)) {
-            throw new InvalidArgumentException(sprintf(
-                'Unsupported response reason phrase; must be a string, received %s',
-                is_object($reasonPhrase) ? get_class($reasonPhrase) : gettype($reasonPhrase)
-            ));
-        }
-
-        if ($reasonPhrase === '' && isset($this->phrases[$code])) {
-            $reasonPhrase = $this->phrases[$code];
+        if ((null === $reasonPhrase || '' === $reasonPhrase) && isset(static::PHRASES[$code])) {
+            $reasonPhrase = self::PHRASES[$code];
         }
 
         $this->reasonPhrase = $reasonPhrase;
-        $this->statusCode = (int) $code;
+        $this->statusCode = (int)$code;
     }
 
     /**

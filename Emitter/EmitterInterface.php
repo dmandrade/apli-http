@@ -1,14 +1,13 @@
 <?php
 /**
- *  Copyright (c) 2019 Danilo Andrade.
+ *  Copyright (c) 2019 Danilo Andrade
  *
  *  This file is part of the apli project.
  *
- * @project apli
- * @file EmitterInterface.php
- *
- * @author Danilo Andrade <danilo@webbingbrasil.com.br>
- * @date 03/02/19 at 20:41
+ *  @project apli
+ *  @file EmitterInterface.php
+ *  @author Danilo Andrade <danilo@webbingbrasil.com.br>
+ *  @date 17/11/19 at 15:57
  */
 
 /**
@@ -41,5 +40,5 @@ interface EmitterInterface
      *
      * @return void
      */
-    public function emit(ResponseInterface $response);
+    public function emit(ResponseInterface $response): void;
 }

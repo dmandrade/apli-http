@@ -16,6 +16,7 @@ namespace Apli\Http\Traits;
 use Apli\Uri\Url;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
+use InvalidArgumentException;
 
 /**
  * Trait with common request behaviors.
@@ -29,7 +30,6 @@ use Psr\Http\Message\UriInterface;
  */
 trait RequestTrait
 {
-    use MessageTrait;
 
     /**
      * @var string

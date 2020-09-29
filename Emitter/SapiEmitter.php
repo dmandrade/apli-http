@@ -21,13 +21,15 @@
 namespace Apli\Http\Emitter;
 
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 class SapiEmitter extends AbstractSapiEmitter
 {
+
     /**
      * {@inheritdoc}
      */
-    public function emit(ResponseInterface $response)
+    public function emit(ResponseInterface $response): void
     {
         $this->assertNoPreviousOutput();
         $this->emitHeaders($response);

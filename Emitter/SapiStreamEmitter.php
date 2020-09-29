@@ -21,6 +21,10 @@
 namespace Apli\Http\Emitter;
 
 use Psr\Http\Message\ResponseInterface;
+use function is_array;
+use function preg_match;
+use function strlen;
+use function substr;
 
 class SapiStreamEmitter extends AbstractSapiEmitter
 {
@@ -36,9 +40,9 @@ class SapiStreamEmitter extends AbstractSapiEmitter
      *
      * @param int $maxBufferLength
      *
-     * @return EmitterInterface
+     * @return self
      */
-    public function setMaxBufferLength(int $maxBufferLength)
+    public function setMaxBufferLength(int $maxBufferLength): self
     {
         $this->maxBufferLength = $maxBufferLength;
 
@@ -48,18 +52,19 @@ class SapiStreamEmitter extends AbstractSapiEmitter
     /**
      * {@inheritdoc}
      */
-    public function emit(ResponseInterface $response)
+    public function emit(ResponseInterface $response): void
     {
         $this->assertNoPreviousOutput();
         $this->emitHeaders($response);
-        // Set the status _after_ the headers, because of PHP's "helpful" behavior with location headers.
         $this->emitStatusLine($response);
         $range = $this->parseContentRange($response->getHeaderLine('Content-Range'));
-        if (\is_array($range) && $range[0] === 'bytes') {
+
+        if (is_array($range) && $range[0] === 'bytes') {
             $this->emitBodyRange($range, $response, $this->maxBufferLength);
         } else {
             $this->emitBody($response, $this->maxBufferLength);
         }
+
         $this->closeConnection();
     }
 
@@ -72,14 +77,14 @@ class SapiStreamEmitter extends AbstractSapiEmitter
      * @return null|array [unit, first, last, length]; returns false if no
      *                    content range or an invalid content range is provided
      */
-    private function parseContentRange($header)
+    private function parseContentRange($header): ?array
     {
-        if (\preg_match('/(?P<unit>[\w]+)\s+(?P<first>\d+)-(?P<last>\d+)\/(?P<length>\d+|\*)/', $header, $matches) === 1) {
+        if (preg_match('/(?P<unit>[\w]+)\s+(?P<first>\d+)-(?P<last>\d+)\/(?P<length>\d+|\*)/', $header, $matches) === 1) {
             return [
                 $matches['unit'],
-                (int) $matches['first'],
-                (int) $matches['last'],
-                $matches['length'] === '*' ? '*' : (int) $matches['length'],
+                (int)$matches['first'],
+                (int)$matches['last'],
+                $matches['length'] === '*' ? '*' : (int)$matches['length'],
             ];
         }
     }
@@ -87,11 +92,11 @@ class SapiStreamEmitter extends AbstractSapiEmitter
     /**
      * Emit a range of the message body.
      *
-     * @param array             $range
+     * @param array $range
      * @param ResponseInterface $response
-     * @param int               $maxBufferLength
+     * @param int $maxBufferLength
      */
-    private function emitBodyRange(array $range, ResponseInterface $response, int $maxBufferLength)
+    private function emitBodyRange(array $range, ResponseInterface $response, int $maxBufferLength): void
     {
         [$unit, $first, $last, $length] = $range;
         $body = $response->getBody();
@@ -101,18 +106,18 @@ class SapiStreamEmitter extends AbstractSapiEmitter
             $first = 0;
         }
         if (!$body->isReadable()) {
-            echo \substr($body->getContents(), $first, (int) $length);
+            echo substr($body->getContents(), $first, (int)$length);
 
             return;
         }
         $remaining = $length;
         while ($remaining >= $maxBufferLength && !$body->eof()) {
             $contents = $body->read($maxBufferLength);
-            $remaining -= \strlen($contents);
+            $remaining -= strlen($contents);
             echo $contents;
         }
         if ($remaining > 0 && !$body->eof()) {
-            echo $body->read((int) $remaining);
+            echo $body->read((int)$remaining);
         }
     }
 
@@ -120,9 +125,9 @@ class SapiStreamEmitter extends AbstractSapiEmitter
      * Sends the message body of the response.
      *
      * @param ResponseInterface $response
-     * @param int               $maxBufferLength
+     * @param int $maxBufferLength
      */
-    private function emitBody(ResponseInterface $response, int $maxBufferLength)
+    private function emitBody(ResponseInterface $response, int $maxBufferLength): void
     {
         $body = $response->getBody();
         if ($body->isSeekable()) {

@@ -26,23 +26,16 @@ use Psr\Http\Message\ResponseInterface;
 
 class EmitterStack extends Stack implements EmitterInterface
 {
+
     /**
-     * Emits a response, including status line, headers, and the message body,
-     * according to the environment.
-     *
-     * @param ResponseInterface $response
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function emit(ResponseInterface $response)
+    public function emit(ResponseInterface $response): void
     {
         foreach ($this as $emitter) {
-            if (false !== $emitter->emit($response)) {
-                return true;
-            }
+            /** @var EmitterInterface $emitter */
+            $emitter->emit($response);
         }
-
-        return false;
     }
 
     /**
@@ -55,9 +48,9 @@ class EmitterStack extends Stack implements EmitterInterface
      *
      * @return void
      */
-    public function offsetSet($index, $emitter)
+    public function offsetSet($index, $emitter): void
     {
-        $this->validateEmitter((array) $emitter);
+        $this->prepareEmitter((array) $emitter);
         parent::offsetSet($index, $emitter);
     }
 
@@ -68,7 +61,7 @@ class EmitterStack extends Stack implements EmitterInterface
      *
      * @throws InvalidEmitterException for non-emitter instances
      */
-    private function validateEmitter($emitters)
+    private function prepareEmitter($emitters): void
     {
         foreach ($emitters as $emitter) {
             if (!$emitter instanceof EmitterInterface) {
@@ -86,9 +79,9 @@ class EmitterStack extends Stack implements EmitterInterface
      *
      * @return void
      */
-    public function push(...$emitters)
+    public function push(...$emitters): void
     {
-        $this->validateEmitter($emitters);
+        $this->prepareEmitter($emitters);
         parent::push(...$emitters);
     }
 }

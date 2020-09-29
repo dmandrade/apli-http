@@ -16,6 +16,7 @@ namespace Apli\Http\Traits;
 use Apli\Http\HeaderSecurity;
 use Apli\Http\Stream\DefaultStream;
 use Psr\Http\Message\StreamInterface;
+use InvalidArgumentException;
 
 /**
  * Trait implementing the various methods defined in MessageInterface.

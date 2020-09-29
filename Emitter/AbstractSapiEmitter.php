@@ -22,9 +22,19 @@ namespace Apli\Http\Emitter;
 
 use Apli\Http\Exception\EmitterException;
 use Psr\Http\Message\ResponseInterface;
+use function fastcgi_finish_request;
+use function function_exists;
+use function header;
+use function in_array;
+use function sprintf;
+use function str_replace;
+use function ucwords;
+use function vsprintf;
+use function rtrim;
 
 abstract class AbstractSapiEmitter implements EmitterInterface
 {
+
     /**
      * Assert either that no headers been sent or the output buffer contains no content.
      *
@@ -32,7 +42,7 @@ abstract class AbstractSapiEmitter implements EmitterInterface
      *
      * @return void
      */
-    protected function assertNoPreviousOutput()
+    protected function assertNoPreviousOutput(): void
     {
         if (headers_sent($file, $line)) {
             throw EmitterException::forHeadersSent();
@@ -55,21 +65,18 @@ abstract class AbstractSapiEmitter implements EmitterInterface
      *
      * @return void
      */
-    protected function emitStatusLine(ResponseInterface $response)
+    protected function emitStatusLine(ResponseInterface $response): void
     {
-        $statusCode = $response->getStatusCode();
+        $statusCode   = $response->getStatusCode();
         header(
-            \vsprintf(
+            vsprintf(
                 'HTTP/%s %d%s',
                 [
                     $response->getProtocolVersion(),
                     $statusCode,
-                    \rtrim(' '.$response->getReasonPhrase()),
+                    rtrim(' ' . $response->getReasonPhrase()),
                 ]
-            ),
-            true,
-            $statusCode
-        );
+            ), true, $statusCode);
     }
 
     /**
@@ -79,15 +86,15 @@ abstract class AbstractSapiEmitter implements EmitterInterface
      *
      * @return void
      */
-    protected function emitHeaders(ResponseInterface $response)
+    protected function emitHeaders(ResponseInterface $response): void
     {
         $statusCode = $response->getStatusCode();
         foreach ($response->getHeaders() as $header => $values) {
-            $name = $this->toWordCase($header);
+            $name  = $this->toWordCase($header);
             $first = $name !== 'Set-Cookie';
             foreach ($values as $value) {
                 header(
-                    \sprintf(
+                    sprintf(
                         '%s: %s',
                         $name,
                         $value
@@ -95,24 +102,20 @@ abstract class AbstractSapiEmitter implements EmitterInterface
                     $first,
                     $statusCode
                 );
+
                 $first = false;
             }
         }
     }
-
     /**
-     * Converts header names to wordcase.
-     *
-     * @param string $header
-     *
-     * @return string
+     * Filter a header name to wordcase
      */
-    protected function toWordCase($header)
+    protected function toWordCase(string $header) : string
     {
-        $filtered = \str_replace('-', ' ', $header);
-        $filtered = \ucwords($filtered);
+        $filtered = str_replace('-', ' ', $header);
+        $filtered = ucwords($filtered);
 
-        return \str_replace(' ', '-', $filtered);
+        return str_replace(' ', '-', $filtered);
     }
 
     /**
@@ -121,13 +124,13 @@ abstract class AbstractSapiEmitter implements EmitterInterface
      *
      * @return void
      */
-    protected function closeConnection()
+    protected function closeConnection(): void
     {
-        if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
+        if (!in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
             Util::closeOutputBuffers(0, true);
         }
-        if (\function_exists('fastcgi_finish_request')) {
-            \fastcgi_finish_request();
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
         }
     }
 }
